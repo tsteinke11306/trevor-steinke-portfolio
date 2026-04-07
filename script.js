@@ -105,7 +105,7 @@ if (contactForm) {
             }
         } catch (error) {
             console.error('Form submission error:', error);
-            alert('Failed to send message. Please try again later.');
+            alert('Failed to send message: ' + error.message + '. Please try again later.');
         } finally {
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
