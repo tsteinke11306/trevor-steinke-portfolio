@@ -70,22 +70,46 @@ document.querySelectorAll('.section').forEach(section => {
     observer.observe(section);
 });
 
-// Contact form handling (placeholder - you'll need to connect this to a backend)
+// Contact form handling - sends to API
 const contactForm = document.querySelector('.contact-form');
 if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         // Get form data
         const formData = new FormData(contactForm);
         const data = Object.fromEntries(formData);
         
-        // Placeholder - show success message
-        // In production, you'd send this to a backend service like Formspree, Netlify Forms, etc.
-        alert('Thank you for your message! This is a demo form. In production, you would connect this to a form handling service.');
+        // Show loading state
+        const submitBtn = contactForm.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Sending...';
+        submitBtn.disabled = true;
         
-        // Reset form
-        contactForm.reset();
+        try {
+            const response = await fetch(contactForm.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                alert('Thank you for your message! I\'ll get back to you soon.');
+                contactForm.reset();
+            } else {
+                alert('Error: ' + (result.error || 'Failed to send message. Please try again.'));
+            }
+        } catch (error) {
+            console.error('Form submission error:', error);
+            alert('Failed to send message. Please try again later.');
+        } finally {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
     });
 }
 
