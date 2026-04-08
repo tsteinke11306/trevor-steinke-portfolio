@@ -1,68 +1,62 @@
-# IT Portfolio Website
+# Trevor Steinke - IT Portfolio
 
-A clean, modern portfolio template for IT professionals.
+Live portfolio website at [trevorsteinke.com](https://trevorsteinke.com)
+
+## About
+
+IT Technician portfolio showcasing skills, projects, and professional development. Built with clean, modern design and deployed via GitHub Pages with a custom domain.
 
 ## Features
 
-- **Responsive design** - Works on desktop, tablet, and mobile
-- **Modern styling** - Clean aesthetic with smooth animations
-- **Sections included:**
-  - About / Bio
-  - Skills & Technologies
-  - Projects & Work History
-  - Certifications
-  - Contact Form
+- **Responsive design** - Works on all devices
+- **Dark mode** - System preference detection + manual toggle
+- **Contact form** - Emails submissions directly to inbox
+- **Analytics** - Self-hosted, privacy-friendly page tracking
+- **Social sharing** - Open Graph tags for nice link previews
 
-## Quick Start
+## Tech Stack
 
-1. Edit `index.html` and replace all placeholder content with your information
-2. Add your photo (replace the image placeholder)
-3. Customize colors in `styles.css` by editing the CSS variables
-4. Deploy to GitHub Pages (free hosting)
+| Layer | Technology |
+|-------|------------|
+| Frontend | HTML, CSS, JavaScript |
+| Hosting | GitHub Pages |
+| DNS | Cloudflare |
+| Contact API | Node.js on VPS (port 8443) |
+| Analytics | SQLite + Node.js on VPS |
 
-## Deploying to GitHub Pages
+## Infrastructure
 
-1. Push this repo to GitHub
-2. Go to Settings → Pages
-3. Set Source to "Deploy from a branch"
-4. Select `main` branch and `/ (root)` folder
-5. Your site will be live at `https://yourusername.github.io/your-repo-name/`
+```
+trevorsteinke.com (GitHub Pages)
+    ├── Static HTML/CSS/JS
+    └── Contact form → api.trevorsteinke.com:8443
+                         ├── POST /api/contact (send email)
+                         ├── POST /api/analytics (track views)
+                         └── GET /api/analytics/stats (dashboard)
 
-## Customization
-
-### Colors
-
-Edit the CSS variables in `styles.css`:
-
-```css
-:root {
-    --primary-color: #2563eb;
-    --primary-hover: #1d4ed8;
-    --bg-color: #ffffff;
-    --bg-alt: #f8fafc;
-    --text-color: #1e293b;
-    --text-light: #64748b;
-}
+Analytics Dashboard: trevorsteinke.com/analytics.html
 ```
 
-### Contact Form
+## Services
 
-The contact form is a placeholder. To make it functional, connect it to a service like:
+- **Contact form backend** - `portfolio-contact.service` on VPS
+- **Reverse proxy** - Caddy on port 8443
+- **Email** - Gmail SMTP (friday.openclawaibot@gmail.com → tsteinke130@gmail.com)
 
-- [Formspree](https://formspree.io/) (free tier available)
-- [Netlify Forms](https://www.netlify.com/products/forms/) (if hosting on Netlify)
-- Your own backend API
+## Updating Content
 
-### Adding a Photo
+Edit `index.html` directly. Changes auto-deploy via GitHub Pages.
 
-Replace the image placeholder with an actual photo:
-
-```html
-<div class="about-image">
-    <img src="your-photo.jpg" alt="Your Name" style="width: 250px; border-radius: 16px;">
-</div>
+For server-side changes (contact/analytics), SSH into the VPS:
+```bash
+systemctl restart portfolio-contact
 ```
 
-## License
+## Analytics Login
 
-MIT License - Feel free to use and modify for your own portfolio.
+- URL: https://trevorsteinke.com/analytics.html
+- Credentials stored in `/root/portfolio-contact/.env`
+
+---
+
+*Built and maintained by Trevor Steinke*
