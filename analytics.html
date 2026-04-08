@@ -69,6 +69,7 @@
 <body>
     <div class="container">
         <a href="/" class="back-link">← Back to portfolio</a>
+        <button onclick="logout()" style="float:right;background:#334155;border:none;color:#94a3b8;padding:0.5rem 1rem;border-radius:6px;cursor:pointer;">Logout</button>
         <h1>📊 Analytics Dashboard</h1>
         
         <div class="stats-grid">
@@ -180,9 +181,17 @@
             } catch (err) {
                 console.error('Failed to load stats:', err);
                 document.querySelectorAll('.loading').forEach(el => {
-                    el.textContent = 'Failed to load data';
+                    el.textContent = 'Failed to load data - check console for details';
                 });
+                document.getElementById('totalViews').textContent = 'Error';
+                document.getElementById('uniqueVisitors').textContent = 'Error';
+                document.getElementById('totalContacts').textContent = 'Error';
             }
+        }
+
+        function logout() {
+            localStorage.removeItem('analytics_credentials');
+            location.reload();
         }
 
         function renderStats(data) {
