@@ -128,50 +128,99 @@
 
         async function loadStats() {
             try {
-                const res = await fetch(API_URL);
+                // Get credentials from localStorage or prompt
+                let credentials = localStorage.getItem('analytics_credentials');
+                
+                if (!credentials) {
+                    const user = prompt('Username:');
+                    const pass = prompt('Password:');
+                    if (!user || !pass) {
+                        alert('Authentication required');
+                        return;
+                    }
+                    credentials = btoa(user + ':' + pass);
+                    localStorage.setItem('analytics_credentials', credentials);
+                }
+
+                const res = await fetch(API_URL, {
+                    headers: {
+                        'Authorization': 'Basic ' + credentials
+                    }
+                });
+                
+                if (res.status === 401) {
+                    localStorage.removeItem('analytics_credentials');
+                    const user = prompt('Username:');
+                    const pass = prompt('Password:');
+                    if (!user || !pass) {
+                        alert('Authentication required');
+                        return;
+                    }
+                    credentials = btoa(user + ':' + pass);
+                    localStorage.setItem('analytics_credentials', credentials);
+                    
+                    const retryRes = await fetch(API_URL, {
+                        headers: {
+                            'Authorization': 'Basic ' + credentials
+                        }
+                    });
+                    
+                    if (!retryRes.ok) {
+                        throw new Error('Invalid credentials');
+                    }
+                    
+                    const data = await retryRes.json();
+                    renderStats(data);
+                    return;
+                }
+                
                 const data = await res.json();
+                renderStats(data);
 
-                document.getElementById('totalViews').textContent = data.totalViews.toLocaleString();
-                document.getElementById('uniqueVisitors').textContent = data.uniqueVisitors.toLocaleString();
-                document.getElementById('totalContacts').textContent = data.totalContacts.toLocaleString();
-
-                // Top Pages
-                const topPagesEl = document.getElementById('topPages');
-                if (data.topPages.length === 0) {
-                    topPagesEl.innerHTML = '<tr><td colspan="2">No data yet</td></tr>';
-                } else {
-                    topPagesEl.innerHTML = data.topPages.map(p => 
-                        `<tr><td>${p.path}</td><td>${p.views}</td></tr>`
-                    ).join('');
-                }
-
-                // Top Referrers
-                const referrersEl = document.getElementById('topReferrers');
-                if (data.topReferrers.length === 0) {
-                    referrersEl.innerHTML = '<tr><td colspan="2">No data yet</td></tr>';
-                } else {
-                    referrersEl.innerHTML = data.topReferrers.map(r => {
-                        const ref = r.referrer || 'Direct';
-                        const display = ref.length > 50 ? ref.substring(0, 50) + '...' : ref;
-                        return `<tr><td>${display}</td><td>${r.count}</td></tr>`;
-                    }).join('');
-                }
-
-                // Recent Activity
-                const activityEl = document.getElementById('recentActivity');
-                if (data.recentActivity.length === 0) {
-                    activityEl.innerHTML = '<tr><td colspan="2">No data yet</td></tr>';
-                } else {
-                    activityEl.innerHTML = data.recentActivity.map(a => {
-                        const time = new Date(a.created_at).toLocaleString();
-                        return `<tr><td>${a.path}</td><td>${time}</td></tr>`;
-                    }).join('');
-                }
             } catch (err) {
                 console.error('Failed to load stats:', err);
                 document.querySelectorAll('.loading').forEach(el => {
                     el.textContent = 'Failed to load data';
                 });
+            }
+        }
+
+        function renderStats(data) {
+            document.getElementById('totalViews').textContent = data.totalViews.toLocaleString();
+            document.getElementById('uniqueVisitors').textContent = data.uniqueVisitors.toLocaleString();
+            document.getElementById('totalContacts').textContent = data.totalContacts.toLocaleString();
+
+            // Top Pages
+            const topPagesEl = document.getElementById('topPages');
+            if (data.topPages.length === 0) {
+                topPagesEl.innerHTML = '<tr><td colspan="2">No data yet</td></tr>';
+            } else {
+                topPagesEl.innerHTML = data.topPages.map(p => 
+                    `<tr><td>${p.path}</td><td>${p.views}</td></tr>`
+                ).join('');
+            }
+
+            // Top Referrers
+            const referrersEl = document.getElementById('topReferrers');
+            if (data.topReferrers.length === 0) {
+                referrersEl.innerHTML = '<tr><td colspan="2">No data yet</td></tr>';
+            } else {
+                referrersEl.innerHTML = data.topReferrers.map(r => {
+                    const ref = r.referrer || 'Direct';
+                    const display = ref.length > 50 ? ref.substring(0, 50) + '...' : ref;
+                    return `<tr><td>${display}</td><td>${r.count}</td></tr>`;
+                }).join('');
+            }
+
+            // Recent Activity
+            const activityEl = document.getElementById('recentActivity');
+            if (data.recentActivity.length === 0) {
+                activityEl.innerHTML = '<tr><td colspan="2">No data yet</td></tr>';
+            } else {
+                activityEl.innerHTML = data.recentActivity.map(a => {
+                    const time = new Date(a.created_at).toLocaleString();
+                    return `<tr><td>${a.path}</td><td>${time}</td></tr>`;
+                }).join('');
             }
         }
 
