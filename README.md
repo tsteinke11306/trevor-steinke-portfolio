@@ -41,7 +41,7 @@ Analytics Dashboard: trevorsteinke.com/analytics.html
 
 - **Contact form backend** - `portfolio-contact.service` on VPS
 - **Reverse proxy** - Caddy on port 8443
-- **Email** - Gmail SMTP (friday.openclawaibot@gmail.com → tsteinke130@gmail.com)
+- **Email** - Gmail SMTP relay → inbox
 
 ## Updating Content
 
