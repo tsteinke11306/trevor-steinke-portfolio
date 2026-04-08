@@ -474,17 +474,13 @@ body {
 }
 
 [data-theme="dark"] .footer {
-    background: #0f172a;
-    border-top: 1px solid var(--border-color);
+    background: #1e293b;
+    border-top: 1px solid #334155;
 }
 
 .footer p {
     margin-bottom: 16px;
-    color: #94a3b8;
-}
-
-[data-theme="dark"] .footer p {
-    color: #94a3b8;
+    color: #cbd5e1;
 }
 
 .footer-links {
@@ -494,18 +490,13 @@ body {
 }
 
 .footer-links a {
-    color: #e2e8f0;
+    color: white;
     text-decoration: none;
-    opacity: 0.9;
     transition: var(--transition);
 }
 
-[data-theme="dark"] .footer-links a {
-    color: #e2e8f0;
-}
-
 .footer-links a:hover {
-    opacity: 1;
+    opacity: 0.8;
 }
 
 /* Responsive Design */
