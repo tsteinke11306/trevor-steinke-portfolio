@@ -184,9 +184,10 @@ document.head.appendChild(style);
             referrer: document.referrer || null
         };
         
-        // Use navigator.sendBeacon for reliability
+        // Use sendBeacon with Blob for proper Content-Type
         if (navigator.sendBeacon) {
-            navigator.sendBeacon(ANALYTICS_ENDPOINT, JSON.stringify(data));
+            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+            navigator.sendBeacon(ANALYTICS_ENDPOINT, blob);
         } else {
             // Fallback to fetch
             fetch(ANALYTICS_ENDPOINT, {
