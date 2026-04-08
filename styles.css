@@ -18,6 +18,15 @@
     --transition: all 0.3s ease;
 }
 
+[data-theme="dark"] {
+    --bg-color: #0f172a;
+    --bg-alt: #1e293b;
+    --text-color: #f1f5f9;
+    --text-light: #94a3b8;
+    --border-color: #334155;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -69,6 +78,31 @@ body {
     gap: 32px;
 }
 
+.theme-toggle {
+    background: none;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    font-size: 18px;
+}
+
+.theme-toggle:hover {
+    border-color: var(--primary-color);
+    background: var(--bg-alt);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .nav-link {
     color: var(--text-color);
     text-decoration: none;
@@ -78,6 +112,26 @@ body {
 
 .nav-link:hover {
     color: var(--primary-color);
+}
+
+.theme-toggle {
+    background: none;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+    font-size: 18px;
+    background-color: var(--bg-color);
+}
+
+.theme-toggle:hover {
+    border-color: var(--primary-color);
+    background: var(--bg-alt);
 }
 
 .nav-toggle {
@@ -476,6 +530,13 @@ body {
     
     .nav-toggle {
         display: flex;
+    }
+    
+    .nav-links {
+        position: absolute;
+        right: 70px;
+        top: 50%;
+        transform: translateY(-50%);
     }
     
     .hero-title {
