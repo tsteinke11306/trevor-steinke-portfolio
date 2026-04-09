@@ -227,7 +227,9 @@
                 activityEl.innerHTML = '<tr><td colspan="2">No data yet</td></tr>';
             } else {
                 activityEl.innerHTML = data.recentActivity.map(a => {
-                    const time = new Date(a.created_at).toLocaleString();
+                    // Timestamps are stored in UTC without timezone indicator
+                    // Append 'Z' to force UTC interpretation
+                    const time = new Date(a.created_at + 'Z').toLocaleString();
                     return `<tr><td>${a.path}</td><td>${time}</td></tr>`;
                 }).join('');
             }
