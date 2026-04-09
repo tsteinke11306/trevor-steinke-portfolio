@@ -229,7 +229,7 @@
                 activityEl.innerHTML = data.recentActivity.map(a => {
                     // Timestamps are stored in UTC without timezone indicator
                     // Append 'Z' to force UTC interpretation
-                    const time = new Date(a.created_at + 'Z').toLocaleString();
+                    const time = new Date(a.created_at + 'Z').toLocaleString('en-US', { timeZone: 'America/New_York' });
                     return `<tr><td>${a.path}</td><td>${time}</td></tr>`;
                 }).join('');
             }
