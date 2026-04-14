@@ -452,6 +452,102 @@ body {
 }
 
 /* Contact Section */
+
+/* Homelab Section */
+.homelab-intro {
+    text-align: center;
+    color: var(--text-light);
+    max-width: 720px;
+    margin: 0 auto 48px;
+    font-size: 1.125rem;
+    line-height: 1.7;
+}
+
+.homelab-arch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 64px;
+    padding: 32px;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+    box-shadow: var(--card-shadow);
+}
+
+.arch-node {
+    text-align: center;
+    padding: 16px 24px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    width: 100%;
+    transition: var(--transition);
+}
+
+.arch-node:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.arch-icon {
+    font-size: 1.75rem;
+    margin-bottom: 4px;
+}
+
+.arch-node h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 2px;
+}
+
+.arch-node p {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+.arch-connector {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    line-height: 1;
+}
+
+.arch-services {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    width: 100%;
+}
+
+.arch-service {
+    text-align: center;
+    padding: 10px 12px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+.arch-service:hover {
+    border-color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .homelab-arch {
+        padding: 20px;
+    }
+}
+
+/* Contact Section */
 .contact-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
