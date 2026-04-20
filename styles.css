@@ -413,6 +413,17 @@ body {
     font-weight: 500;
 }
 
+.tag-link {
+    background: var(--primary-color);
+    color: #fff;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+}
+
+.tag-link:hover {
+    opacity: 0.8;
+}
+
 /* Certifications Section */
 .certifications-grid {
     display: grid;
