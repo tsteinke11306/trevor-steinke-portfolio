@@ -310,6 +310,14 @@ body {
     font-size: 0.875rem;
 }
 
+.headshot {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 .about-text p {
     margin-bottom: 16px;
     font-size: 1.125rem;
