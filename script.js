@@ -114,6 +114,10 @@ if (contactForm) {
         submitBtn.textContent = 'Sending...';
         submitBtn.disabled = true;
         
+        const statusDiv = document.getElementById('form-status');
+        statusDiv.className = 'form-status';
+        statusDiv.textContent = '';
+        
         try {
             const response = await fetch(contactForm.action, {
                 method: 'POST',
@@ -126,14 +130,17 @@ if (contactForm) {
             const result = await response.json();
             
             if (result.success) {
-                alert('Thank you for your message! I\'ll get back to you soon.');
+                statusDiv.className = 'form-status success';
+                statusDiv.textContent = 'Thank you for your message! I\'ll get back to you soon.';
                 contactForm.reset();
             } else {
-                alert('Error: ' + (result.error || 'Failed to send message. Please try again.'));
+                statusDiv.className = 'form-status error';
+                statusDiv.textContent = 'Error: ' + (result.error || 'Failed to send message. Please try again.');
             }
         } catch (error) {
             console.error('Form submission error:', error);
-            alert('Failed to send message: ' + error.message + '. Please try again later.');
+            statusDiv.className = 'form-status error';
+            statusDiv.textContent = 'Failed to send message: ' + error.message + '. Please try again later.';
         } finally {
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
@@ -163,15 +170,6 @@ window.addEventListener('scroll', () => {
         }
     });
 });
-
-// Add CSS for active nav link
-const style = document.createElement('style');
-style.textContent = `
-    .nav-link.active {
-        color: var(--primary-color);
-    }
-`;
-document.head.appendChild(style);
 
 // Analytics tracking
 (function() {
