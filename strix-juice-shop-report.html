@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strix Pentest Report — OWASP Juice Shop v20.1.1</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-table: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #2b9246;
+    --critical: #f85149;
+    --high: #db6d28;
+    --medium: #d29922;
+    --info: #388bfd;
+    --safe: #2b9246;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', Consolas, monospace;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  h2 { font-size: 1.25rem; margin: 32px 0 12px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border); color: var(--accent); }
+  h3 { font-size: 1.05rem; margin: 20px 0 8px 0; color: var(--text); }
+  h4 { font-size: 0.95rem; margin: 16px 0 6px 0; color: var(--text-dim); }
+  p { margin-bottom: 10px; color: var(--text); }
+  .subtitle { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 24px; }
+
+  /* Stat Cards */
+  .stats { display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+  }
+  .stat-card .num { font-size: 2rem; font-weight: bold; }
+  .stat-card .label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+  .stat-critical .num { color: var(--critical); }
+  .stat-high .num { color: var(--high); }
+  .stat-medium .num { color: var(--medium); }
+  .stat-total .num { color: var(--accent); }
+  .stat-safe .num { color: var(--safe); }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .badge-critical { background: rgba(248,81,73,0.15); color: var(--critical); border: 1px solid rgba(248,81,73,0.4); }
+  .badge-high { background: rgba(219,109,40,0.15); color: var(--high); border: 1px solid rgba(219,109,40,0.4); }
+  .badge-medium { background: rgba(210,153,34,0.15); color: var(--medium); border: 1px solid rgba(210,153,34,0.4); }
+  .badge-safe { background: rgba(43,146,70,0.15); color: var(--safe); border: 1px solid rgba(43,146,70,0.4); }
+  .badge-info { background: rgba(56,139,253,0.15); color: var(--info); border: 1px solid rgba(56,139,253,0.4); }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 0.85rem; }
+  th { background: var(--bg-table); padding: 10px 12px; text-align: left; border-bottom: 2px solid var(--border); color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  /* Finding Cards */
+  .finding {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+  }
+  .finding-critical { border-left-color: var(--critical); }
+  .finding-high { border-left-color: var(--high); }
+  .finding-medium { border-left-color: var(--medium); }
+  .finding-header { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .finding-title { font-size: 0.95rem; font-weight: bold; }
+  .finding-id { color: var(--text-dim); font-size: 0.8rem; }
+  .finding-detail { font-size: 0.82rem; color: var(--text-dim); margin: 6px 0; }
+  .finding-detail strong { color: var(--text); }
+  .finding-payload {
+    background: #010409;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin: 8px 0;
+    word-break: break-all;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Lists */
+  ul, ol { margin: 8px 0 12px 20px; }
+  li { margin-bottom: 6px; font-size: 0.85rem; }
+  li strong { color: var(--text); }
+
+  /* Safe Section */
+  .safe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .safe-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; font-size: 0.82rem; }
+  .safe-item strong { color: var(--safe); }
+
+  /* Recommendations */
+  .rec-section { margin-bottom: 16px; }
+  .rec-section h3 { display: flex; align-items: center; gap: 8px; }
+
+  /* Root Causes */
+  .root-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .root-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; font-size: 0.82rem; }
+
+  /* Methodology */
+  .method-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .method-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 14px; }
+  .method-card h4 { margin-bottom: 8px; color: var(--accent); }
+
+  /* Misc */
+  .meta { color: var(--text-dim); font-size: 0.8rem; }
+  .tag { background: rgba(255,255,255,0.05); padding: 1px 6px; border-radius: 4px; font-size: 0.72rem; color: var(--text-dim); }
+  hr { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+  .container { max-width: 100%; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Strix Security Penetration Test Report</h1>
+<p class="subtitle">Generated: 2026-06-30 12:36:26 UTC | Tool: Strix v1.0.4 | Model: GLM-5.2 (ollama-cloud)</p>
+
+<!-- ============ EXECUTIVE SUMMARY ============ -->
+<h2>Executive Summary</h2>
+<p>A comprehensive black-box security assessment was performed against <strong>OWASP Juice Shop v20.1.1</strong> hosted at <code>http://host.docker.internal:3000</code>. The assessment identified <strong>26 confirmed vulnerabilities</strong> across 7 vulnerability classes, including 5 critical-severity findings that enable complete authentication bypass, database exfiltration, and administrative account takeover.</p>
+
+<div class="stats">
+  <div class="stat-card stat-total"><div class="num">26</div><div class="label">Total Findings</div></div>
+  <div class="stat-card stat-critical"><div class="num">5</div><div class="label">Critical</div></div>
+  <div class="stat-card stat-high"><div class="num">5</div><div class="label">High</div></div>
+  <div class="stat-card stat-medium"><div class="num">16</div><div class="label">Medium</div></div>
+  <div class="stat-card stat-safe"><div class="num">6</div><div class="label">Tested Safe</div></div>
+</div>
+
+<p>The most severe issues: SQL injection in the login endpoint allowing password-free admin access; UNION-based SQL injection in product search enabling full database extraction (all 29 user accounts with MD5 password hashes); JWT algorithm confusion and alg=none attacks allowing forged admin tokens; and mass assignment on user registration creating admin accounts. Multiple high-severity IDOR vulnerabilities allow any authenticated user to read other users' baskets, checkout on their behalf, delete their feedback, and access all user profiles and complaints.</p>
+
+<p>The application's security posture is critically weak. Authentication, authorization, input validation, and output encoding controls are systematically broken across the API surface. An unauthenticated attacker can extract the entire database or gain admin access within minutes. Authenticated low-privilege users can compromise other accounts, manipulate financial transactions, and abuse race conditions for fraud.</p>
+
+<p style="color: var(--safe);">No SSRF, XXE, RCE, or SSTI vulnerabilities were found in this version, indicating some server-side controls have been improved in recent releases.</p>
+
+<!-- ============ FINDINGS SUMMARY TABLE ============ -->
+<h2>Findings Summary</h2>
+<table>
+<thead>
+<tr>
+  <th style="width:30px;">#</th>
+  <th style="width:80px;">Severity</th>
+  <th>Vulnerability</th>
+  <th style="width:80px;">CWE</th>
+  <th style="width:60px;">CVSS</th>
+  <th>Endpoint</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>1</td><td><span class="badge badge-critical">Critical</span></td><td>SQL Injection in Login</td><td>CWE-89</td><td>9.8</td><td>POST /rest/user/login</td></tr>
+<tr><td>2</td><td><span class="badge badge-critical">Critical</span></td><td>UNION-based SQLi in Product Search</td><td>CWE-89</td><td>9.8</td><td>GET /rest/products/search</td></tr>
+<tr><td>3</td><td><span class="badge badge-critical">Critical</span></td><td>JWT alg=none Auth Bypass</td><td>CWE-347</td><td>9.8</td><td>All protected endpoints</td></tr>
+<tr><td>4</td><td><span class="badge badge-critical">Critical</span></td><td>JWT RS256 to HS256 Algorithm Confusion</td><td>CWE-347</td><td>9.8</td><td>/encryptionkeys/jwt.pub</td></tr>
+<tr><td>5</td><td><span class="badge badge-critical">Critical</span></td><td>Mass Assignment Privilege Escalation</td><td>CWE-915</td><td>9.8</td><td>POST /api/Users</td></tr>
+<tr><td>6</td><td><span class="badge badge-high">High</span></td><td>DOM-based XSS in Search</td><td>CWE-79</td><td>8.9</td><td>GET /search?q=</td></tr>
+<tr><td>7</td><td><span class="badge badge-high">High</span></td><td>Stored XSS via Product Reviews + Data Export</td><td>CWE-79</td><td>7.1</td><td>PUT /rest/products/{id}/reviews</td></tr>
+<tr><td>8</td><td><span class="badge badge-high">High</span></td><td>Sensitive File Disclosure via Null Byte Bypass</td><td>CWE-22</td><td>8.2</td><td>GET /ftp/</td></tr>
+<tr><td>9</td><td><span class="badge badge-high">High</span></td><td>Unauthenticated Configuration Disclosure</td><td>CWE-200</td><td>7.5</td><td>GET /rest/admin/application-configuration</td></tr>
+<tr><td>10</td><td><span class="badge badge-high">High</span></td><td>Race Condition on Basket Checkout</td><td>CWE-362</td><td>7.1</td><td>POST /rest/basket/{id}/checkout</td></tr>
+<tr><td>11</td><td><span class="badge badge-medium">Medium</span></td><td>IDOR on Basket Read</td><td>CWE-639</td><td>8.1</td><td>GET /rest/basket/{id}</td></tr>
+<tr><td>12</td><td><span class="badge badge-medium">Medium</span></td><td>IDOR on Feedback Deletion</td><td>CWE-639</td><td>8.1</td><td>DELETE /api/Feedbacks/{id}</td></tr>
+<tr><td>13</td><td><span class="badge badge-medium">Medium</span></td><td>IDOR on Basket Checkout</td><td>CWE-639</td><td>6.5</td><td>POST /rest/basket/{id}/checkout</td></tr>
+<tr><td>14</td><td><span class="badge badge-medium">Medium</span></td><td>BFLA on User Listing</td><td>CWE-639</td><td>6.5</td><td>GET /api/Users</td></tr>
+<tr><td>15</td><td><span class="badge badge-medium">Medium</span></td><td>IDOR on User Profile Access</td><td>CWE-639</td><td>6.5</td><td>GET /api/Users/{id}</td></tr>
+<tr><td>16</td><td><span class="badge badge-medium">Medium</span></td><td>IDOR on Basket Item Deletion</td><td>CWE-639</td><td>6.5</td><td>DELETE /api/BasketItems/{id}</td></tr>
+<tr><td>17</td><td><span class="badge badge-medium">Medium</span></td><td>Negative Basket Quantity Checkout</td><td>CWE-20</td><td>6.5</td><td>POST /api/BasketItems</td></tr>
+<tr><td>18</td><td><span class="badge badge-medium">Medium</span></td><td>IDOR on Complaints Read</td><td>CWE-639</td><td>4.3</td><td>GET /api/Complaints</td></tr>
+<tr><td>19</td><td><span class="badge badge-medium">Medium</span></td><td>BFLA on Inventory Access</td><td>CWE-639</td><td>4.3</td><td>GET /api/Quantitys</td></tr>
+<tr><td>20</td><td><span class="badge badge-medium">Medium</span></td><td>Unauthenticated Review Submission</td><td>CWE-306</td><td>5.3</td><td>PUT /rest/products/{id}/reviews</td></tr>
+<tr><td>21</td><td><span class="badge badge-medium">Medium</span></td><td>Mass Assignment in Recycle API</td><td>CWE-915</td><td>4.3</td><td>POST /api/Recycles</td></tr>
+<tr><td>22</td><td><span class="badge badge-medium">Medium</span></td><td>Zero-Quantity Basket Checkout</td><td>CWE-20</td><td>4.3</td><td>POST /rest/basket/{id}/checkout</td></tr>
+<tr><td>23</td><td><span class="badge badge-medium">Medium</span></td><td>Verbose Error Messages</td><td>CWE-209</td><td>5.3</td><td>All error responses</td></tr>
+<tr><td>24</td><td><span class="badge badge-medium">Medium</span></td><td>Prometheus Metrics and Swagger UI Exposure</td><td>CWE-200</td><td>5.3</td><td>/metrics, /api-docs/</td></tr>
+<tr><td>25</td><td><span class="badge badge-medium">Medium</span></td><td>JWT Contains Password Hash</td><td>CWE-522</td><td>7.5</td><td>All JWT tokens</td></tr>
+<tr><td>26</td><td><span class="badge badge-medium">Medium</span></td><td>Exposed /ftp/ Directory</td><td>CWE-538</td><td>5.3</td><td>GET /ftp/</td></tr>
+</tbody>
+</table>
+
+<!-- ============ CRITICAL FINDINGS ============ -->
+<h2>Critical Severity Findings (CVSS 9.8)</h2>
+
+<div class="finding finding-critical">
+  <div class="finding-header">
+    <span class="finding-id">#1</span>
+    <span class="finding-title">SQL Injection in Login</span>
+    <span class="badge badge-critical">Critical</span>
+    <span class="tag">CWE-89</span>
+    <span class="tag">CVSS 9.8</span>
+  </div>
+  <p class="finding-detail"><strong>Endpoint:</strong> POST /rest/user/login</p>
+  <p class="finding-detail">The login endpoint accepts SQL injection in the email field. The backend constructs raw SQL queries without parameterization. Payload bypasses password verification and returns a valid admin JWT token.</p>
+  <div class="finding-payload">admin@juice-sh.op'--  ||  ' OR 1=1--</div>
+</div>
+
+<div class="finding finding-critical">
+  <div class="finding-header">
+    <span class="finding-id">#2</span>
+    <span class="finding-title">UNION-based SQL Injection in Product Search</span>
+    <span class="badge badge-critical">Critical</span>
+    <span class="tag">CWE-89</span>
+    <span class="tag">CVSS 9.8</span>
+  </div>
+  <p class="finding-detail"><strong>Endpoint:</strong> GET /rest/products/search?q=</p>
+  <p class="finding-detail">UNION-based injection extracts the complete database: all 29 user accounts with MD5 password hashes, full schema (22 tables), and SQLite version info.</p>
+  <div class="finding-payload">')) UNION SELECT id,email,password,role,5,6,7,8,9 FROM Users--</div>
+</div>
+
+<div class="finding finding-critical">
+  <div class="finding-header">
+    <span class="finding-id">#3</span>
+    <span class="finding-title">JWT alg=none Authentication Bypass</span>
+    <span class="badge badge-critical">Critical</span>
+    <span class="tag">CWE-347</span>
+    <span class="tag">CVSS 9.8</span>
+  </div>
+  <p class="finding-detail"><strong>Library:</strong> express-jwt 0.1.3 (outdated)</p>
+  <p class="finding-detail">The outdated JWT library accepts tokens with {"alg":"none"} and no signature. Forged tokens with admin claims grant full administrative access to all protected endpoints.</p>
+</div>
+
+<div class="finding finding-critical">
+  <div class="finding-header">
+    <span class="finding-id">#4</span>
+    <span class="finding-title">JWT RS256 to HS256 Algorithm Confusion</span>
+    <span class="badge badge-critical">Critical</span>
+    <span class="tag">CWE-347</span>
+    <span class="tag">CVSS 9.8</span>
+  </div>
+  <p class="finding-detail"><strong>Endpoint:</strong> /encryptionkeys/jwt.pub (RSA public key exposed)</p>
+  <p class="finding-detail">The RSA public key can be used as an HMAC secret to forge valid HS256 tokens. The server accepts these forged tokens as legitimate, enabling impersonation of any user including admin.</p>
+</div>
+
+<div class="finding finding-critical">
+  <div class="finding-header">
+    <span class="finding-id">#5</span>
+    <span class="finding-title">Mass Assignment Privilege Escalation</span>
+    <span class="badge badge-critical">Critical</span>
+    <span class="tag">CWE-915</span>
+    <span class="tag">CVSS 9.8</span>
+  </div>
+  <p class="finding-detail"><strong>Endpoint:</strong> POST /api/Users (registration)</p>
+  <p class="finding-detail">The registration endpoint accepts a "role" field in the JSON body. Setting "role":"admin" during registration creates a user with administrative privileges, bypassing the intended customer-only default role.</p>
+  <div class="finding-payload">{"email":"user@test.com","password":"Pass123","passwordRepeat":"Pass123","role":"admin"}</div>
+</div>
+
+<!-- ============ HIGH FINDINGS ============ -->
+<h2>High Severity Findings (CVSS 7.1-8.9)</h2>
+
+<div class="finding finding-high">
+  <div class="finding-header">
+    <span class="finding-id">#6</span>
+    <span class="finding-title">DOM-based XSS in Search</span>
+    <span class="badge badge-high">High</span>
+    <span class="tag">CWE-79</span>
+    <span class="tag">CVSS 8.9</span>
+  </div>
+  <p class="finding-detail">Angular frontend calls bypassSecurityTrustHtml() on the URL query parameter q, rendering it via [innerHTML]. No authentication required.</p>
+  <div class="finding-payload">&lt;img src=x onerror=alert(1)&gt;</div>
+</div>
+
+<div class="finding finding-high">
+  <div class="finding-header">
+    <span class="finding-id">#7</span>
+    <span class="finding-title">Stored XSS via Product Reviews + Data Export</span>
+    <span class="badge badge-high">High</span>
+    <span class="tag">CWE-79</span>
+    <span class="tag">CVSS 7.1</span>
+  </div>
+  <p class="finding-detail">Product reviews stored without HTML sanitization. Data export feature uses document.write() to render user data, causing stored XSS payloads in reviews to execute. Requires authentication.</p>
+</div>
+
+<div class="finding finding-high">
+  <div class="finding-header">
+    <span class="finding-id">#8</span>
+    <span class="finding-title">Sensitive File Disclosure via Null Byte Bypass</span>
+    <span class="badge badge-high">High</span>
+    <span class="tag">CWE-22</span>
+    <span class="tag">CVSS 8.2</span>
+  </div>
+  <p class="finding-detail">The /ftp/ endpoint restricts file access to .md/.pdf extensions, but double-encoded null bytes bypass the filter. Confirmed retrieval of package.json.bak, suspicious_errors.yml, KeePass database, and Python bytecode.</p>
+  <div class="finding-payload">%2500.md  (double-encoded null byte)</div>
+</div>
+
+<div class="finding finding-high">
+  <div class="finding-header">
+    <span class="finding-id">#9</span>
+    <span class="finding-title">Unauthenticated Configuration Disclosure</span>
+    <span class="badge badge-high">High</span>
+    <span class="tag">CWE-200</span>
+    <span class="tag">CVSS 7.5</span>
+  </div>
+  <p class="finding-detail">GET /rest/admin/application-configuration returns 23KB of sensitive configuration without authentication, including OAuth client IDs, chatbot model details, challenge solutions, and internal server settings.</p>
+</div>
+
+<div class="finding finding-high">
+  <div class="finding-header">
+    <span class="finding-id">#10</span>
+    <span class="finding-title">Race Condition on Basket Checkout</span>
+    <span class="badge badge-high">High</span>
+    <span class="tag">CWE-362</span>
+    <span class="tag">CVSS 7.1</span>
+  </div>
+  <p class="finding-detail">POST /rest/basket/{id}/checkout has no concurrency control. 20 concurrent requests on the same basket all succeeded, creating 20 duplicate orders from a single item.</p>
+</div>
+
+<!-- ============ MEDIUM FINDINGS ============ -->
+<h2>Medium Severity Findings (CVSS 4.3-8.1)</h2>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#11</span><span class="finding-title">IDOR on Basket Read</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-639</span><span class="tag">CVSS 8.1</span></div>
+  <p class="finding-detail">Any user can read other users' baskets via GET /rest/basket/{id}. No ownership verification.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#12</span><span class="finding-title">IDOR on Feedback Deletion</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-639</span><span class="tag">CVSS 8.1</span></div>
+  <p class="finding-detail">Any user can delete other users' feedback via DELETE /api/Feedbacks/{id}. No ownership check.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#13</span><span class="finding-title">IDOR on Basket Checkout</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-639</span><span class="tag">CVSS 6.5</span></div>
+  <p class="finding-detail">Any user can checkout other users' baskets via POST /rest/basket/{id}/checkout.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#14</span><span class="finding-title">BFLA on User Listing</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-639</span><span class="tag">CVSS 6.5</span></div>
+  <p class="finding-detail">Regular users can list all users including admin emails via GET /api/Users. Broken Function Level Authorization.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#15</span><span class="finding-title">IDOR on User Profile Access</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-639</span><span class="tag">CVSS 6.5</span></div>
+  <p class="finding-detail">Any user can access other user profiles via GET /api/Users/{id}.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#16</span><span class="finding-title">IDOR on Basket Item Deletion</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-639</span><span class="tag">CVSS 6.5</span></div>
+  <p class="finding-detail">No ownership check on basket item deletion via DELETE /api/BasketItems/{id}.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#17</span><span class="finding-title">Negative Basket Quantity Checkout</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-20</span><span class="tag">CVSS 6.5</span></div>
+  <p class="finding-detail">Negative quantities accepted, resulting in negative order totals. No server-side validation.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#18</span><span class="finding-title">IDOR on Complaints Read</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-639</span><span class="tag">CVSS 4.3</span></div>
+  <p class="finding-detail">Any user can read all complaints via GET /api/Complaints.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#19</span><span class="finding-title">BFLA on Inventory Access</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-639</span><span class="tag">CVSS 4.3</span></div>
+  <p class="finding-detail">Inventory data accessible to customers via GET /api/Quantitys.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#20</span><span class="finding-title">Unauthenticated Review Submission</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-306</span><span class="tag">CVSS 5.3</span></div>
+  <p class="finding-detail">Reviews accepted without authentication via PUT /rest/products/{id}/reviews.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#21</span><span class="finding-title">Mass Assignment in Recycle API</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-915</span><span class="tag">CVSS 4.3</span></div>
+  <p class="finding-detail">POST /api/Recycles accepts UserId, negative quantities, and arbitrary IDs via mass assignment.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#22</span><span class="finding-title">Zero-Quantity Basket Checkout</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-20</span><span class="tag">CVSS 4.3</span></div>
+  <p class="finding-detail">Checkout succeeds with 0 items in basket. No validation for minimum basket contents.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#23</span><span class="finding-title">Verbose Error Messages</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-209</span><span class="tag">CVSS 5.3</span></div>
+  <p class="finding-detail">Stack traces leak filesystem paths, Express/SQLite versions in error responses.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#24</span><span class="finding-title">Prometheus Metrics and Swagger UI Exposure</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-200</span><span class="tag">CVSS 5.3</span></div>
+  <p class="finding-detail">/metrics and /api-docs/ endpoints publicly accessible without authentication.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#25</span><span class="finding-title">JWT Contains Password Hash</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-522</span><span class="tag">CVSS 7.5</span></div>
+  <p class="finding-detail">MD5 password hash and TOTP secret embedded in JWT payload. Token leakage exposes credential material.</p>
+</div>
+
+<div class="finding finding-medium">
+  <div class="finding-header"><span class="finding-id">#26</span><span class="finding-title">Exposed /ftp/ Directory</span><span class="badge badge-medium">Medium</span><span class="tag">CWE-538</span><span class="tag">CVSS 5.3</span></div>
+  <p class="finding-detail">Confidential business documents publicly served via GET /ftp/ directory listing.</p>
+</div>
+
+<!-- ============ TESTED SAFE ============ -->
+<h2>Tested and Confirmed Safe</h2>
+<div class="safe-grid">
+  <div class="safe-item"><strong>SSRF</strong> — Profile image URLs stored but not fetched server-side (OAST confirmed via interactsh)</div>
+  <div class="safe-item"><strong>XXE</strong> — B2B v2 orders does not parse XML body in v20.1.1</div>
+  <div class="safe-item"><strong>RCE</strong> — No command injection vectors found</div>
+  <div class="safe-item"><strong>SSTI</strong> — Track-order character stripping is not template evaluation</div>
+  <div class="safe-item"><strong>Path Traversal</strong> — Express normalizes /ftp/../../../../etc/passwd paths</div>
+  <div class="safe-item"><strong>Source Maps</strong> — Not exposed</div>
+</div>
+
+<!-- ============ METHODOLOGY ============ -->
+<h2>Methodology</h2>
+<p class="meta">Engagement Type: Black-box testing (no source code access) | Scope: http://host.docker.internal:3000 (OWASP Juice Shop v20.1.1) | Frameworks: OWASP WSTG, PTES, OSSTMM</p>
+
+<h3>Phase 1 — Reconnaissance and Attack Surface Mapping</h3>
+<ul>
+  <li>HTTP fingerprinting and technology identification (Node.js, Express, Angular, SQLite, Sequelize ORM)</li>
+  <li>API endpoint enumeration via probing and configuration disclosure endpoints</li>
+  <li>Directory discovery via robots.txt (/ftp directory identified)</li>
+  <li>Application configuration extraction (/rest/admin/application-configuration)</li>
+  <li>Authentication flow analysis (JWT-based, Bearer tokens)</li>
+</ul>
+
+<h3>Phase 2 — Systematic Vulnerability Testing</h3>
+<p>Seven specialized testing agents were deployed in parallel, each focusing on a specific vulnerability class:</p>
+
+<div class="method-grid">
+  <div class="method-card">
+    <h4>SQL Injection</h4>
+    <p class="finding-detail">Login, search, basket, product endpoints. Manual payload crafting + sqlmap. Error-based, boolean-based, and UNION-based injection.</p>
+  </div>
+  <div class="method-card">
+    <h4>Authentication and JWT</h4>
+    <p class="finding-detail">Login bypass, token forgery, algorithm confusion, password hashing. JWT manipulation with jwt_tool and custom scripts.</p>
+  </div>
+  <div class="method-card">
+    <h4>IDOR and Access Control</h4>
+    <p class="finding-detail">Basket, user, admin, feedback, complaint endpoints. Ownership and role verification testing.</p>
+  </div>
+  <div class="method-card">
+    <h4>XSS</h4>
+    <p class="finding-detail">Search, reviews, feedback, chatbot, file upload, DOM analysis. Browser-based verification via agent-browser.</p>
+  </div>
+  <div class="method-card">
+    <h4>Path Traversal and Info Disclosure</h4>
+    <p class="finding-detail">FTP directory, sensitive files, error messages, metrics. Null byte encoding bypass testing.</p>
+  </div>
+  <div class="method-card">
+    <h4>Business Logic and Race Conditions</h4>
+    <p class="finding-detail">Basket manipulation, checkout, reviews, recycle, concurrency. Async testing with asyncio/aiohttp.</p>
+  </div>
+  <div class="method-card">
+    <h4>SSRF and Server-Side</h4>
+    <p class="finding-detail">Profile image, B2B orders, XML parsing, command injection, SSTI. OAST via interactsh for blind confirmation.</p>
+  </div>
+</div>
+
+<h4>Tools Used</h4>
+<p><span class="tag">curl</span> <span class="tag">sqlmap</span> <span class="tag">jwt_tool</span> <span class="tag">Python (asyncio/aiohttp)</span> <span class="tag">agent-browser</span> <span class="tag">interactsh-client</span> <span class="tag">custom exploit scripts</span></p>
+
+<!-- ============ ROOT CAUSES ============ -->
+<h2>Systemic Root Causes</h2>
+<div class="root-grid">
+  <div class="root-item"><strong>1.</strong> No SQL parameterization — raw query construction throughout the API</div>
+  <div class="root-item"><strong>2.</strong> Outdated JWT library (express-jwt 0.1.3) with known algorithm confusion vulnerabilities</div>
+  <div class="root-item"><strong>3.</strong> No field whitelisting on POST/PUT endpoints — mass assignment across registration, recycle, and other APIs</div>
+  <div class="root-item"><strong>4.</strong> No ownership verification on IDOR-prone endpoints — basket ID from URL, not from JWT</div>
+  <div class="root-item"><strong>5.</strong> bypassSecurityTrustHtml() used unsafely in 9 locations in the Angular frontend</div>
+  <div class="root-item"><strong>6.</strong> No concurrency controls on state-changing operations</div>
+  <div class="root-item"><strong>7.</strong> Weak password hashing (unsalted MD5)</div>
+  <div class="root-item"><strong>8.</strong> No authentication on admin configuration and metrics endpoints</div>
+</div>
+
+<!-- ============ RECOMMENDATIONS ============ -->
+<h2>Recommendations</h2>
+
+<div class="rec-section">
+  <h3><span class="badge badge-critical">Immediate</span> Fix within 24 hours</h3>
+  <ol>
+    <li><strong>Parameterize all SQL queries.</strong> Replace raw SQL string concatenation in /rest/user/login and /rest/products/search with Sequelize parameter binding. Eliminates login bypass and UNION-based extraction.</li>
+    <li><strong>Upgrade express-jwt and jsonwebtoken.</strong> Upgrade to express-jwt 8.x+ and jsonwebtoken 9.x+. Pin algorithms: ['RS256'] to prevent alg=none and RS256 to HS256 confusion. Remove public key from /encryptionkeys/jwt.pub.</li>
+    <li><strong>Implement field whitelisting on POST /api/Users.</strong> Only accept email, password, passwordRepeat. Set role server-side to "customer" exclusively. Apply to all POST/PUT endpoints.</li>
+    <li><strong>Remove sensitive files from /ftp/.</strong> Remove KeePass database, Python bytecode, package.json.bak, encrypted files. Reject null bytes after full URL decoding. Validate extensions post-decode.</li>
+    <li><strong>Add authentication middleware to all /rest/admin/* endpoints.</strong> Configuration and version endpoints must require admin auth.</li>
+  </ol>
+</div>
+
+<div class="rec-section">
+  <h3><span class="badge badge-high">Short-Term</span> Fix within 1 week</h3>
+  <ol start="6">
+    <li><strong>Fix IDOR on basket endpoints.</strong> Derive basket ID from JWT bid claim, not URL parameter. Apply ownership checks to GET /rest/basket/{id}, POST /rest/basket/{id}/checkout, DELETE /api/BasketItems/{id}.</li>
+    <li><strong>Add role-based authorization.</strong> Restrict /api/Users, /api/Users/{id}, /api/Complaints, /api/Quantitys to admin only. Add ownership verification to DELETE /api/Feedbacks/{id}.</li>
+    <li><strong>Fix XSS.</strong> Remove bypassSecurityTrustHtml() from search component. Use Angular text interpolation. Sanitize reviews server-side. Replace document.write() in data export with textContent.</li>
+    <li><strong>Add concurrency controls to checkout.</strong> Implement basket state machine (open to checked_out) with database-level locking (SELECT FOR UPDATE or optimistic concurrency).</li>
+    <li><strong>Migrate password hashing.</strong> Move from unsalted MD5 to bcrypt or Argon2. Remove password hashes and TOTP secrets from JWT payloads.</li>
+    <li><strong>Add server-side quantity validation.</strong> Reject negative and zero quantities. Require at least 1 item with quantity > 0 before checkout.</li>
+    <li><strong>Require auth on reviews.</strong> Add authentication to PUT /rest/products/{id}/reviews. Field allowlisting on POST /api/Recycles.</li>
+  </ol>
+</div>
+
+<div class="rec-section">
+  <h3><span class="badge badge-medium">Medium-Term</span> Fix within 1 month</h3>
+  <ol start="13">
+    <li><strong>Suppress verbose errors.</strong> Set NODE_ENV=production. Generic error handlers that suppress stack traces, file paths, framework versions, SQL errors.</li>
+    <li><strong>Protect /metrics and /api-docs/.</strong> Require authentication or restrict to internal network ranges.</li>
+    <li><strong>Implement security headers.</strong> CSP, Strict-Transport-Security, Referrer-Policy. X-Content-Type-Options already present.</li>
+    <li><strong>Audit all 9 bypassSecurityTrustHtml() calls.</strong> Remove or replace each with safe alternatives unless documented business need exists.</li>
+    <li><strong>Rate limiting on auth endpoints.</strong> Login, registration, password reset to mitigate brute-force attacks.</li>
+  </ol>
+</div>
+
+<!-- ============ RETEST ============ -->
+<h2>Retest and Validation</h2>
+<ul>
+  <li>Re-run SQL injection tests against /rest/user/login and /rest/products/search to confirm parameterization</li>
+  <li>Verify JWT tokens with alg=none and HS256-forged signatures are rejected</li>
+  <li>Attempt mass assignment with role=admin on registration to confirm it is ignored</li>
+  <li>Test concurrent checkout to confirm race condition is resolved</li>
+  <li>Validate /ftp/ no longer serves sensitive files and null byte bypasses are blocked</li>
+</ul>
+
+<hr>
+<p class="meta" style="text-align:center;">
+  Strix v1.0.4 | GLM-5.2 (753B MoE) via ollama-cloud | 7 parallel agent streams | Black-box assessment<br>
+  OWASP Juice Shop v20.1.1 | 2026-06-30
+</p>
+
+</div>
+</body>
+</html>
