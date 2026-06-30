@@ -31,20 +31,20 @@
     --primary-color: #3b82f6;
     --primary-hover: #2563eb;
     --secondary-color: #9ca3af;
-    --bg-color: #080808;
-    --bg-alt: #0d0d0d;
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-bg-hover: rgba(255, 255, 255, 0.06);
-    --glass-bg-alt: rgba(255, 255, 255, 0.02);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-border-hover: rgba(59, 130, 246, 0.3);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --glass-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4);
+    --bg-color: #050505;
+    --bg-alt: #0a0a0a;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-bg-hover: rgba(255, 255, 255, 0.08);
+    --glass-bg-alt: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-hover: rgba(59, 130, 246, 0.4);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.5);
     --text-color: #f0f0f0;
     --text-light: #9ca3af;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --glow-color: rgba(59, 130, 246, 0.06);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glow-color: rgba(59, 130, 246, 0.1);
 }
 
 html {
@@ -57,10 +57,11 @@ body {
     color: var(--text-color);
     background-color: var(--bg-color);
     background-image:
-        radial-gradient(ellipse 80% 50% at 50% -20%, var(--glow-color), transparent),
-        radial-gradient(ellipse 60% 40% at 80% 80%, var(--glow-color), transparent),
-        radial-gradient(ellipse 50% 40% at 10% 60%, var(--glow-color), transparent);
+        radial-gradient(ellipse 80% 50% at 50% -10%, var(--glow-color), transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, var(--glow-color), transparent 70%),
+        radial-gradient(ellipse 50% 40% at 10% 60%, var(--glow-color), transparent 70%);
     background-attachment: fixed;
+    background-repeat: no-repeat;
     min-height: 100vh;
 }
 
