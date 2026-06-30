@@ -352,7 +352,7 @@ body::before {
 }
 
 .section-alt {
-    background: var(--bg-alt);
+    background: transparent;
 }
 
 .section-title {
