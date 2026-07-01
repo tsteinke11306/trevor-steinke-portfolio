@@ -320,14 +320,7 @@ body::before {
     text-align: center;
 }
 
-/* Linux Tux icon: dark in light mode, light in dark mode */
-.linux-icon path {
-    fill: #1e293b;
-}
-
-[data-theme="dark"] .linux-icon path {
-    fill: #f5f5f5;
-}
+/* Linux Tux icon uses local SVG with built-in multi-color (black body, white belly, yellow beak/feet) */
 
 /* Buttons */
 .btn {
