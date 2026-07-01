@@ -321,6 +321,10 @@ body::before {
 }
 
 /* Linux Tux icon uses local SVG with built-in multi-color (black body, white belly, yellow beak/feet) */
+.tech-logo img[src*="linux-tux"] {
+    image-rendering: -webkit-optimize-contrast;
+    shape-rendering: geometricPrecision;
+}
 
 /* Buttons */
 .btn {
