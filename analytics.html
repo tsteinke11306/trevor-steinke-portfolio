@@ -127,6 +127,16 @@
     <script>
         const API_URL = 'https://api.trevorsteinke.com:8443/api/analytics/stats';
 
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         async function loadStats() {
             try {
                 // Get credentials from localStorage or prompt
@@ -205,7 +215,7 @@
                 topPagesEl.innerHTML = '<tr><td colspan="2">No data yet</td></tr>';
             } else {
                 topPagesEl.innerHTML = data.topPages.map(p => 
-                    `<tr><td>${p.path}</td><td>${p.views}</td></tr>`
+                    `<tr><td>${escapeHtml(p.path)}</td><td>${escapeHtml(p.views)}</td></tr>`
                 ).join('');
             }
 
@@ -217,7 +227,7 @@
                 referrersEl.innerHTML = data.topReferrers.map(r => {
                     const ref = r.referrer || 'Direct';
                     const display = ref.length > 50 ? ref.substring(0, 50) + '...' : ref;
-                    return `<tr><td>${display}</td><td>${r.count}</td></tr>`;
+                    return `<tr><td>${escapeHtml(display)}</td><td>${escapeHtml(r.count)}</td></tr>`;
                 }).join('');
             }
 
@@ -230,7 +240,7 @@
                     // Timestamps are stored in UTC without timezone indicator
                     // Append 'Z' to force UTC interpretation
                     const time = new Date(a.created_at + 'Z').toLocaleString('en-US', { timeZone: 'America/New_York' });
-                    return `<tr><td>${a.path}</td><td>${time}</td></tr>`;
+                    return `<tr><td>${escapeHtml(a.path)}</td><td>${escapeHtml(time)}</td></tr>`;
                 }).join('');
             }
         }
