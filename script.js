@@ -76,6 +76,9 @@ window.addEventListener('scroll', () => {
 });
 
 // Intersection Observer for fade-in animations
+// Respects prefers-reduced-motion, and defaults to visible if JS fails or reduced motion is set
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 const observerOptions = {
     threshold: 0.1,
     rootMargin: '0px 0px -50px 0px'
@@ -86,17 +89,20 @@ const observer = new IntersectionObserver((entries) => {
         if (entry.isIntersecting) {
             entry.target.style.opacity = '1';
             entry.target.style.transform = 'translateY(0)';
+            observer.unobserve(entry.target);
         }
     });
 }, observerOptions);
 
-// Apply fade-in animation to sections
-document.querySelectorAll('.section').forEach(section => {
-    section.style.opacity = '0';
-    section.style.transform = 'translateY(20px)';
-    section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(section);
-});
+// Apply fade-in animation to sections (skip if reduced motion)
+if (!prefersReducedMotion) {
+    document.querySelectorAll('.section').forEach(section => {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(section);
+    });
+}
 
 // Contact form handling - sends to API
 const contactForm = document.querySelector('.contact-form');
