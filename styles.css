@@ -389,12 +389,6 @@ body::before {
     letter-spacing: 0.02em;
 }
 
-/* Linux Tux icon uses local SVG with built-in multi-color (black body, white belly, yellow beak/feet) */
-.tech-logo img[src*="linux-tux"] {
-    image-rendering: -webkit-optimize-contrast;
-    shape-rendering: geometricPrecision;
-}
-
 /* ============================================
    Buttons
    ============================================ */
@@ -670,7 +664,8 @@ body::before {
 .cert-icon {
     font-size: 2.5rem;
     margin-bottom: 12px;
-    filter: grayscale(100%);
+    color: var(--text-color);
+    line-height: 1;
 }
 
 .cert-name {
@@ -747,7 +742,8 @@ body::before {
 .arch-icon {
     font-size: 1.75rem;
     margin-bottom: 4px;
-    filter: grayscale(100%);
+    color: var(--text-color);
+    line-height: 1;
 }
 
 .arch-node h4 {
