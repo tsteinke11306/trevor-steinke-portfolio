@@ -13,31 +13,31 @@ document.querySelectorAll('.nav-link').forEach(link => {
     });
 });
 
-// Dark Mode Toggle
+// Dark Mode Toggle - dark B&W is default
 const themeToggle = document.getElementById('theme-toggle');
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
 
-// Check for saved theme preference or use system preference
-const currentTheme = localStorage.getItem('theme') || 
-    (prefersDark.matches ? 'dark' : 'light');
+// Check for saved theme preference. Default = dark.
+const currentTheme = localStorage.getItem('theme') ||
+    (prefersLight.matches ? 'light' : 'dark');
 
 // Apply theme on page load
-if (currentTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    themeToggle.textContent = '☀️';
+if (currentTheme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    themeToggle.textContent = '🌙';
 }
 
 themeToggle.addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     
-    if (currentTheme === 'dark') {
+    if (currentTheme === 'light') {
         document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
-        themeToggle.textContent = '🌙';
-    } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
         themeToggle.textContent = '☀️';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+        themeToggle.textContent = '🌙';
     }
 });
 

@@ -26,13 +26,13 @@
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://trevorsteinke.com/">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%232563eb'/><text x='50' y='72' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>TS</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230a0a0a'/><text x='50' y='72' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='monospace'>TS</text></svg>">
     
     <link rel="stylesheet" href="styles.css">
     <noscript><style>.section { opacity: 1 !important; transform: none !important; }</style></noscript>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -60,15 +60,9 @@
         <div class="nav-container">
             <a href="#" class="nav-logo" aria-label="Home">
                 <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="36" height="36" rx="10" fill="url(#logo-grad)"/>
-                    <path d="M10 13l4 3.5-4 3.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M17 20h7" stroke="white" stroke-width="2" stroke-linecap="round"/>
-                    <defs>
-                        <linearGradient id="logo-grad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
-                            <stop stop-color="#2563eb"/>
-                            <stop offset="1" stop-color="#1d4ed8"/>
-                        </linearGradient>
-                    </defs>
+                    <rect width="36" height="36" rx="10" fill="var(--text-color)"/>
+                    <path d="M10 13l4 3.5-4 3.5" stroke="var(--bg-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M17 20h7" stroke="var(--bg-color)" stroke-width="2" stroke-linecap="round"/>
                 </svg>
             </a>
             <button class="nav-toggle" aria-label="Toggle navigation">
@@ -86,8 +80,8 @@
                 <li><a href="#contact" class="nav-link">Contact</a></li>
             </ul>
             <div class="nav-links">
-                <button class="theme-toggle" aria-label="Toggle dark mode" id="theme-toggle">
-                    🌙
+                <button class="theme-toggle" aria-label="Toggle light mode" id="theme-toggle">
+                    ☀️
                 </button>
             </div>
         </div>
@@ -110,7 +104,7 @@
     <!-- About Section -->
     <section id="about" class="section">
         <div class="container">
-            <h2 class="section-title">About Me</h2>
+            <h2 class="section-title"><span class="section-eyebrow">Background</span>About Me</h2>
             <div class="about-content">
                 <div class="about-image">
                     <img src="headshot.jpeg" alt="Trevor Steinke" class="headshot">
@@ -127,7 +121,7 @@
     <!-- Skills Section -->
     <section id="skills" class="section section-alt">
         <div class="container">
-            <h2 class="section-title">Skills & Technologies</h2>
+            <h2 class="section-title"><span class="section-eyebrow">Toolbox</span>Skills & Technologies</h2>
             <div class="tech-logos">
                 <div class="tech-logo" title="Microsoft 365">
                     <svg viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -227,7 +221,7 @@
     <!-- Microsoft 365 Section -->
     <section id="m365" class="section section-alt">
         <div class="container">
-            <h2 class="section-title">Microsoft 365 Administration</h2>
+            <h2 class="section-title"><span class="section-eyebrow">Cloud Admin</span>Microsoft 365 Administration</h2>
             <div class="skills-grid">
                 <div class="skill-category">
                     <h3 class="skill-category-title">Identity & Access</h3>
@@ -268,7 +262,7 @@
     <!-- Projects Section -->
     <section id="projects" class="section">
         <div class="container">
-            <h2 class="section-title">Projects & Work History</h2>
+            <h2 class="section-title"><span class="section-eyebrow">Build Log</span>Projects & Work History</h2>
             <div class="projects-grid">
                 <div class="project-card">
                     <div class="project-header">
@@ -363,7 +357,7 @@
     <!-- Homelab & Security Section -->
     <section id="homelab" class="section section-alt">
         <div class="container">
-            <h2 class="section-title">Homelab & Security</h2>
+            <h2 class="section-title"><span class="section-eyebrow">Infrastructure</span>Homelab & Security</h2>
             <p class="homelab-intro">Self-hosted infrastructure running on Ubuntu 24.04 (VPS) with zero trust networking, containerized services, and security monitoring. Every service is built, configured, and maintained from scratch.</p>
 
             <div class="homelab-arch">
@@ -518,7 +512,7 @@
     <!-- Certifications Section -->
     <section id="certifications" class="section section-alt">
         <div class="container">
-            <h2 class="section-title">Professional Development</h2>
+            <h2 class="section-title"><span class="section-eyebrow">Growth</span>Professional Development</h2>
             <div class="certifications-grid">
                 <div class="cert-card">
                     <div class="cert-icon">📚</div>
@@ -551,7 +545,7 @@
     <!-- Contact Section -->
     <section id="contact" class="section">
         <div class="container">
-            <h2 class="section-title">Get In Touch</h2>
+            <h2 class="section-title"><span class="section-eyebrow">Connect</span>Get In Touch</h2>
             <div class="contact-content">
                 <div class="contact-info">
                     <h3>Let's Connect</h3>
