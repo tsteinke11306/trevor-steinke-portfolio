@@ -364,7 +364,7 @@ body::before {
     box-shadow: inset 0 1px 0 0 var(--glass-border-highlight);
     border-radius: 12px;
     transition: var(--transition);
-    min-width: 120px;
+    min-width: 80px;
 }
 
 .tech-logo:hover {
@@ -377,8 +377,8 @@ body::before {
 .tech-logo svg,
 .tech-logo img,
 .tech-logo .braille-icon {
-    width: 96px;
-    height: 72px;
+    width: 72px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -386,7 +386,7 @@ body::before {
 
 .braille-icon {
     font-family: var(--font-display);
-    font-size: 32px;
+    font-size: 22px;
     line-height: 1;
     letter-spacing: 0;
     white-space: pre;
@@ -682,7 +682,7 @@ body::before {
 }
 
 .cert-icon .braille-icon {
-    font-size: 38px;
+    font-size: 28px;
 }
 
 .cert-name {
@@ -763,7 +763,7 @@ body::before {
 }
 
 .arch-icon .braille-icon {
-    font-size: 32px;
+    font-size: 22px;
 }
 
 .arch-node h4 {
