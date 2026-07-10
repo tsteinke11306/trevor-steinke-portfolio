@@ -27,16 +27,8 @@
         { el: description, text: description.textContent.trim(), delay: 1900, speed: 12 },
     ];
 
-    // Create cursor elements (one per line since they type simultaneously)
-    function createCursor() {
-        const c = document.createElement('span');
-        c.className = 'typing-cursor';
-        return c;
-    }
-
     function typeElement(el, text, speed, preserveChild) {
         return new Promise(resolve => {
-            const cursor = createCursor();
             // For the badge, preserve the status-dot span
             let childToPreserve = null;
             if (preserveChild) {
@@ -45,11 +37,9 @@
             el.innerHTML = '';
             if (childToPreserve) el.appendChild(childToPreserve);
             el.style.visibility = 'visible';
-            el.appendChild(cursor);
             let i = 0;
             function type() {
                 if (i < text.length) {
-                    cursor.remove();
                     if (childToPreserve) {
                         el.textContent = '';
                         el.appendChild(childToPreserve);
@@ -57,12 +47,10 @@
                     } else {
                         el.textContent = text.substring(0, i + 1);
                     }
-                    el.appendChild(cursor);
                     i++;
                     setTimeout(type, speed + Math.random() * 15);
                 } else {
-                    // Leave cursor blinking on this line
-                    resolve(cursor);
+                    resolve();
                 }
             }
             type();
@@ -74,13 +62,8 @@
         await new Promise(r => setTimeout(r, 200));
 
         // Type all lines simultaneously, like 4 CLI lines
-        const typePromises = elements.map((item, idx) => {
-            return typeElement(item.el, item.text, item.speed, item.el === badge).then((cursor) => {
-                // Each line's cursor blinks for 3s then disappears
-                setTimeout(() => {
-                    cursor.classList.add('hidden');
-                }, 3000);
-            });
+        const typePromises = elements.map((item) => {
+            return typeElement(item.el, item.text, item.speed, item.el === badge);
         });
 
         // Wait for all lines to finish
