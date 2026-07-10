@@ -375,21 +375,9 @@ body::before {
 }
 
 .tech-logo svg,
-.tech-logo img,
-.tech-logo .braille-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.braille-icon {
-    font-family: var(--font-display);
-    font-size: 11px;
-    line-height: 1;
-    letter-spacing: 0;
-    white-space: pre;
-    color: var(--text-color);
-    text-align: center;
+.tech-logo img {
+    width: 40px;
+    height: 40px;
 }
 
 .tech-logo span {
@@ -674,13 +662,10 @@ body::before {
 }
 
 .cert-icon {
+    font-size: 2.5rem;
     margin-bottom: 12px;
     color: var(--text-color);
     line-height: 1;
-}
-
-.cert-icon .braille-icon {
-    font-size: 14px;
 }
 
 .cert-name {
@@ -755,13 +740,10 @@ body::before {
 }
 
 .arch-icon {
+    font-size: 1.75rem;
     margin-bottom: 4px;
     color: var(--text-color);
     line-height: 1;
-}
-
-.arch-icon .braille-icon {
-    font-size: 11px;
 }
 
 .arch-node h4 {
