@@ -76,10 +76,13 @@
             await new Promise(r => setTimeout(r, idx === 0 ? 0 : 150));
             const isLast = idx === elements.length - 1;
             await typeElement(item.el, item.text, item.speed, item.el === badge);
-            // On the last element, keep the cursor blinking
+            // On the last element, keep the cursor blinking for a few seconds then hide it
             if (isLast) {
                 item.el.appendChild(cursor);
                 cursor.classList.remove('hidden');
+                setTimeout(() => {
+                    cursor.classList.add('hidden');
+                }, 3000);
             }
         }
 
