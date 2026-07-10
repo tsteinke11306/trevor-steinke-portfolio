@@ -306,6 +306,33 @@ body::before {
     margin-right: auto;
 }
 
+/* Typing animation cursor */
+.typing-cursor {
+    display: inline-block;
+    width: 0.6em;
+    height: 1.1em;
+    background: var(--text-color);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink-cursor 0.8s step-end infinite;
+}
+
+.typing-cursor.hidden { display: none; }
+
+@keyframes blink-cursor {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Pre-animation hidden state */
+.hero-typing .availability-badge,
+.hero-typing .hero-title,
+.hero-typing .hero-subtitle,
+.hero-typing .hero-description,
+.hero-typing .btn-primary {
+    visibility: hidden;
+}
+
 /* Availability Badge (glass pill) */
 .availability-badge {
     display: inline-flex;

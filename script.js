@@ -1,3 +1,89 @@
+// ============================================
+// Hero typing animation (CLI-style)
+// Respects prefers-reduced-motion
+// ============================================
+(function() {
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (prefersReducedMotion) {
+        hero.classList.remove('hero-typing');
+        return;
+    }
+
+    const badge = hero.querySelector('.availability-badge');
+    const title = hero.querySelector('.hero-title');
+    const subtitle = hero.querySelector('.hero-subtitle');
+    const description = hero.querySelector('.hero-description');
+    const button = hero.querySelector('.btn-primary');
+
+    // Store original text content
+    const elements = [
+        { el: badge, text: badge.textContent.trim(), delay: 0, speed: 30 },
+        { el: title, text: title.textContent.trim(), delay: 400, speed: 50 },
+        { el: subtitle, text: subtitle.textContent.trim(), delay: 1200, speed: 40 },
+        { el: description, text: description.textContent.trim(), delay: 1900, speed: 25 },
+    ];
+
+    // Create cursor element
+    const cursor = document.createElement('span');
+    cursor.className = 'typing-cursor';
+
+    function typeElement(el, text, speed) {
+        return new Promise(resolve => {
+            el.innerHTML = '';
+            el.style.visibility = 'visible';
+            el.appendChild(cursor);
+            cursor.classList.remove('hidden');
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    cursor.remove();
+                    el.textContent = text.substring(0, i + 1);
+                    el.appendChild(cursor);
+                    i++;
+                    setTimeout(type, speed + Math.random() * 30);
+                } else {
+                    cursor.remove();
+                    resolve();
+                }
+            }
+            type();
+        });
+    }
+
+    async function runTyping() {
+        // Small initial delay for page settle
+        await new Promise(r => setTimeout(r, 300));
+
+        for (const item of elements) {
+            await new Promise(r => setTimeout(r, item.delay === 0 ? 0 : 200));
+            await typeElement(item.el, item.text, item.speed);
+        }
+
+        // Show button with a fade-in
+        await new Promise(r => setTimeout(r, 400));
+        button.style.visibility = 'visible';
+        button.style.opacity = '0';
+        button.style.transition = 'opacity 0.4s ease';
+        requestAnimationFrame(() => {
+            button.style.opacity = '1';
+        });
+
+        // Remove typing class (allows re-display if needed)
+        hero.classList.remove('hero-typing');
+    }
+
+    // Start after fonts load (or immediately if already loaded)
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(runTyping);
+    } else {
+        runTyping();
+    }
+})();
+
 // Mobile Navigation Toggle
 const navToggle = document.querySelector('.nav-toggle');
 const navMenu = document.querySelector('.nav-menu');
