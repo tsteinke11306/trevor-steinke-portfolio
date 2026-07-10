@@ -384,7 +384,7 @@ body::before {
 
 .braille-icon {
     font-family: var(--font-display);
-    font-size: 7px;
+    font-size: 11px;
     line-height: 1;
     letter-spacing: 0;
     white-space: pre;
@@ -680,7 +680,7 @@ body::before {
 }
 
 .cert-icon .braille-icon {
-    font-size: 9px;
+    font-size: 14px;
 }
 
 .cert-name {
@@ -761,7 +761,7 @@ body::before {
 }
 
 .arch-icon .braille-icon {
-    font-size: 7px;
+    font-size: 11px;
 }
 
 .arch-node h4 {
