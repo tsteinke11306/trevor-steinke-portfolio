@@ -377,11 +377,10 @@ body::before {
 .tech-logo svg,
 .tech-logo img,
 .tech-logo .braille-icon {
-    width: 72px;
-    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
 .braille-icon {
