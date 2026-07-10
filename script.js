@@ -27,12 +27,16 @@
         { el: description, text: description.textContent.trim(), delay: 1900, speed: 12 },
     ];
 
-    // Create cursor element
-    const cursor = document.createElement('span');
-    cursor.className = 'typing-cursor';
+    // Create cursor elements (one per line since they type simultaneously)
+    function createCursor() {
+        const c = document.createElement('span');
+        c.className = 'typing-cursor';
+        return c;
+    }
 
     function typeElement(el, text, speed, preserveChild) {
         return new Promise(resolve => {
+            const cursor = createCursor();
             // For the badge, preserve the status-dot span
             let childToPreserve = null;
             if (preserveChild) {
@@ -42,13 +46,11 @@
             if (childToPreserve) el.appendChild(childToPreserve);
             el.style.visibility = 'visible';
             el.appendChild(cursor);
-            cursor.classList.remove('hidden');
             let i = 0;
             function type() {
                 if (i < text.length) {
                     cursor.remove();
                     if (childToPreserve) {
-                        // Insert text after the dot
                         el.textContent = '';
                         el.appendChild(childToPreserve);
                         el.appendChild(document.createTextNode(' ' + text.substring(0, i + 1)));
@@ -59,8 +61,8 @@
                     i++;
                     setTimeout(type, speed + Math.random() * 15);
                 } else {
-                    cursor.remove();
-                    resolve();
+                    // Leave cursor blinking on this line
+                    resolve(cursor);
                 }
             }
             type();
@@ -71,20 +73,18 @@
         // Small initial delay for page settle
         await new Promise(r => setTimeout(r, 200));
 
-        for (let idx = 0; idx < elements.length; idx++) {
-            const item = elements[idx];
-            await new Promise(r => setTimeout(r, idx === 0 ? 0 : 150));
-            const isLast = idx === elements.length - 1;
-            await typeElement(item.el, item.text, item.speed, item.el === badge);
-            // On the last element, keep the cursor blinking for a few seconds then hide it
-            if (isLast) {
-                item.el.appendChild(cursor);
-                cursor.classList.remove('hidden');
+        // Type all lines simultaneously, like 4 CLI lines
+        const typePromises = elements.map((item, idx) => {
+            return typeElement(item.el, item.text, item.speed, item.el === badge).then((cursor) => {
+                // Each line's cursor blinks for 3s then disappears
                 setTimeout(() => {
                     cursor.classList.add('hidden');
                 }, 3000);
-            }
-        }
+            });
+        });
+
+        // Wait for all lines to finish
+        await Promise.all(typePromises);
 
         // Show button with a fade-in
         await new Promise(r => setTimeout(r, 200));
