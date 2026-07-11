@@ -330,6 +330,7 @@ body::before {
 .hero-typing .hero-subtitle,
 .hero-typing .hero-description {
     visibility: hidden;
+    clip-path: inset(0 100% 0 0);
 }
 
 .hero-typing .btn-primary {

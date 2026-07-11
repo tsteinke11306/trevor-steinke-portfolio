@@ -40,6 +40,7 @@
                 childToPreserve = el.querySelector('.status-dot');
             }
             el.style.visibility = 'visible';
+            el.style.transition = 'clip-path 0.1s linear';
 
             let resolved = 0;
             let hold = 0;
@@ -49,6 +50,7 @@
                     hold++;
                     if (hold > 3) {
                         clearInterval(id);
+                        el.style.clipPath = 'inset(0 0% 0 0)';
                         if (childToPreserve) {
                             el.textContent = '';
                             el.appendChild(childToPreserve);
@@ -59,6 +61,7 @@
                         resolve();
                         return;
                     }
+                    el.style.clipPath = 'inset(0 0% 0 0)';
                     if (childToPreserve) {
                         el.textContent = '';
                         el.appendChild(childToPreserve);
@@ -72,6 +75,10 @@
                 resolved += charsPerTick;
                 const rc = Math.floor(resolved);
                 const scrambled = scrambleText(text, rc);
+
+                // Reveal clip-path proportional to resolution progress
+                const progress = Math.min(100, (rc / text.length) * 100);
+                el.style.clipPath = `inset(0 ${100 - progress}% 0 0)`;
 
                 if (childToPreserve) {
                     el.textContent = '';
