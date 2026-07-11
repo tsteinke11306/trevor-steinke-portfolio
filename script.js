@@ -1,5 +1,7 @@
 // ============================================
-// Hero typing animation (CLI-style)
+// Hero scramble/decode animation (Hermes desktop style)
+// Each character cycles through random chars before resolving
+// left-to-right. All lines run simultaneously.
 // Respects prefers-reduced-motion
 // ============================================
 (function() {
@@ -19,55 +21,87 @@
     const description = hero.querySelector('.hero-description');
     const button = hero.querySelector('.btn-primary');
 
-    // Store original text content
-    const elements = [
-        { el: badge, text: badge.textContent.trim(), delay: 0, speed: 15 },
-        { el: title, text: title.textContent.trim(), delay: 400, speed: 25 },
-        { el: subtitle, text: subtitle.textContent.trim(), delay: 1200, speed: 20 },
-        { el: description, text: description.textContent.trim(), delay: 1900, speed: 12 },
-    ];
+    // Characters to cycle through during scramble (even-width mono set)
+    const SCRAMBLE_CHARS = '/\\|-_=+<>~:*';
+    const TICK_MS = 40;
 
-    function typeElement(el, text, speed, preserveChild) {
+    function scrambleText(text, resolvedCount) {
+        return Array.from(text, (ch, i) => {
+            if (ch === ' ') return ' ';
+            if (i < resolvedCount) return ch;
+            return SCRAMBLE_CHARS[(Math.random() * SCRAMBLE_CHARS.length) | 0];
+        }).join('');
+    }
+
+    function scrambleElement(el, text, preserveChild) {
         return new Promise(resolve => {
-            // For the badge, preserve the status-dot span
             let childToPreserve = null;
             if (preserveChild) {
                 childToPreserve = el.querySelector('.status-dot');
             }
-            el.innerHTML = '';
-            if (childToPreserve) el.appendChild(childToPreserve);
             el.style.visibility = 'visible';
-            let i = 0;
-            function type() {
-                if (i < text.length) {
+
+            let resolved = 0;
+            let hold = 0;
+
+            const id = setInterval(() => {
+                if (resolved >= text.length) {
+                    hold++;
+                    if (hold > 3) {
+                        clearInterval(id);
+                        // Final: set clean text
+                        if (childToPreserve) {
+                            el.textContent = '';
+                            el.appendChild(childToPreserve);
+                            el.appendChild(document.createTextNode(' ' + text));
+                        } else {
+                            el.textContent = text;
+                        }
+                        resolve();
+                        return;
+                    }
+                    // Show resolved text during hold
                     if (childToPreserve) {
                         el.textContent = '';
                         el.appendChild(childToPreserve);
-                        el.appendChild(document.createTextNode(' ' + text.substring(0, i + 1)));
+                        el.appendChild(document.createTextNode(' ' + text));
                     } else {
-                        el.textContent = text.substring(0, i + 1);
+                        el.textContent = text;
                     }
-                    i++;
-                    setTimeout(type, speed + Math.random() * 15);
-                } else {
-                    resolve();
+                    return;
                 }
-            }
-            type();
+
+                resolved += 0.5;
+                const rc = Math.floor(resolved);
+                const scrambled = scrambleText(text, rc);
+
+                if (childToPreserve) {
+                    el.textContent = '';
+                    el.appendChild(childToPreserve);
+                    el.appendChild(document.createTextNode(' ' + scrambled));
+                } else {
+                    el.textContent = scrambled;
+                }
+            }, TICK_MS);
         });
     }
 
-    async function runTyping() {
+    async function runScramble() {
         // Small initial delay for page settle
         await new Promise(r => setTimeout(r, 200));
 
-        // Type all lines simultaneously, like 4 CLI lines
-        const typePromises = elements.map((item) => {
-            return typeElement(item.el, item.text, item.speed, item.el === badge);
-        });
+        const elements = [
+            { el: badge, text: badge.textContent.trim(), preserveChild: true },
+            { el: title, text: title.textContent.trim(), preserveChild: false },
+            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false },
+            { el: description, text: description.textContent.trim(), preserveChild: false },
+        ];
 
-        // Wait for all lines to finish
-        await Promise.all(typePromises);
+        // All lines scramble simultaneously
+        const promises = elements.map(item =>
+            scrambleElement(item.el, item.text, item.preserveChild)
+        );
+        await Promise.all(promises);
 
         // Show button with a fade-in
         await new Promise(r => setTimeout(r, 200));
@@ -84,9 +118,9 @@
 
     // Start after fonts load (or immediately if already loaded)
     if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(runTyping);
+        document.fonts.ready.then(runScramble);
     } else {
-        runTyping();
+        runScramble();
     }
 })();
 
