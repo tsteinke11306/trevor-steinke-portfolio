@@ -101,12 +101,9 @@
         );
         await Promise.all(promises);
 
-        // Show button with a fade-in
+        // Show button with a fade-in (opacity starts at 0 from CSS)
         await new Promise(r => setTimeout(r, 200));
-        button.style.visibility = 'visible';
-        button.style.opacity = '0';
         button.style.transition = 'opacity 0.4s ease';
-        // Double rAF ensures browser paints opacity:0 before transitioning to 1
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 button.style.opacity = '1';

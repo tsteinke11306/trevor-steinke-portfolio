@@ -328,9 +328,12 @@ body::before {
 .hero-typing .availability-badge,
 .hero-typing .hero-title,
 .hero-typing .hero-subtitle,
-.hero-typing .hero-description,
-.hero-typing .btn-primary {
+.hero-typing .hero-description {
     visibility: hidden;
+}
+
+.hero-typing .btn-primary {
+    opacity: 0;
 }
 
 /* Availability Badge (glass pill) */
