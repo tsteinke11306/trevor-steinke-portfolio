@@ -23,7 +23,7 @@
 
     // Characters to cycle through during scramble (even-width mono set)
     const SCRAMBLE_CHARS = '/\\|-_=+<>~:*';
-    const TICK_MS = 40;
+    const TICK_MS = 70;
 
     function scrambleText(text, resolvedCount) {
         return Array.from(text, (ch, i) => {
@@ -96,10 +96,10 @@
         await new Promise(r => setTimeout(r, 200));
 
         const elements = [
-            { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 0.3 },
-            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.3 },
-            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.3 },
-            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 1 },
+            { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 0.5 },
+            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.5 },
+            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.5 },
+            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 1.8 },
         ];
 
         // All lines scramble simultaneously
