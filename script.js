@@ -12,6 +12,8 @@
 
     if (prefersReducedMotion) {
         hero.classList.remove('hero-typing');
+        document.querySelector('.navbar').style.transform = 'none';
+        document.querySelector('.navbar').style.animation = 'none';
         return;
     }
 
