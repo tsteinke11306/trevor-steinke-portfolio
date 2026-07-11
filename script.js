@@ -23,7 +23,7 @@
 
     // Characters to cycle through during scramble (even-width mono set)
     const SCRAMBLE_CHARS = '/\\|-_=+<>~:*';
-    const TICK_MS = 70;
+    const TICK_MS = 50;
 
     function scrambleText(text, resolvedCount) {
         return Array.from(text, (ch, i) => {
@@ -41,8 +41,8 @@
             }
             el.style.visibility = 'visible';
 
-            // Sweep clip-path open fast (300ms), independent of scramble
-            el.style.transition = 'clip-path 0.3s ease-out';
+            // Sweep clip-path open (500ms), slightly faster than scramble
+            el.style.transition = 'clip-path 0.5s ease-out';
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     el.style.clipPath = 'inset(0 0% 0 0)';
