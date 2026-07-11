@@ -334,7 +334,7 @@ body::before {
 
 .hero-typing .btn-primary {
     opacity: 0;
-    transform: translateY(20px);
+    clip-path: inset(0 100% 0 0);
 }
 
 /* Availability Badge (glass pill) */

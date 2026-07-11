@@ -101,13 +101,13 @@
         );
         await Promise.all(promises);
 
-        // Show button with slide-up + fade-in
+        // Show button with left-to-right draw-on (clip-path reveal)
         await new Promise(r => setTimeout(r, 200));
-        button.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+        button.style.transition = 'opacity 0.2s ease, clip-path 0.5s ease';
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 button.style.opacity = '1';
-                button.style.transform = 'translateY(0)';
+                button.style.clipPath = 'inset(0 0% 0 0)';
             });
         });
 
