@@ -23,7 +23,7 @@
 
     // Characters to cycle through during scramble (even-width mono set)
     const SCRAMBLE_CHARS = '/\\|-_=+<>~:*';
-    const TICK_MS = 25;
+    const TICK_MS = 40;
 
     function scrambleText(text, resolvedCount) {
         return Array.from(text, (ch, i) => {
@@ -89,10 +89,10 @@
         await new Promise(r => setTimeout(r, 200));
 
         const elements = [
-            { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 2 },
-            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 2 },
-            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 2 },
-            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 4 },
+            { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 0.5 },
+            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.5 },
+            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.5 },
+            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 2 },
         ];
 
         // All lines scramble simultaneously
@@ -111,9 +111,9 @@
             });
         });
 
-        // Scramble the button text
+        // Scramble the button text (fast - just barely visible)
         const buttonText = button.textContent.trim();
-        await scrambleElement(button, buttonText, false, 0.5);
+        await scrambleElement(button, buttonText, false, 3);
 
         // Remove typing class
         hero.classList.remove('hero-typing');
