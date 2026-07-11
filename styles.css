@@ -139,7 +139,7 @@ body::before {
     border-bottom: 1px solid var(--glass-border);
     z-index: 1000;
     transform: translateY(-100%);
-    animation: nav-sweep-down 0.5s ease-out 2s forwards;
+    animation: nav-sweep-down 0.5s ease-out 3s forwards;
 }
 
 @keyframes nav-sweep-down {
