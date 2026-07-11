@@ -96,10 +96,10 @@
         await new Promise(r => setTimeout(r, 200));
 
         const elements = [
-            { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 0.5 },
-            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.5 },
-            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.5 },
-            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 2 },
+            { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 0.3 },
+            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.3 },
+            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.3 },
+            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 1 },
         ];
 
         // All lines scramble simultaneously
