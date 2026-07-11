@@ -157,6 +157,14 @@ body::before {
     transition: var(--transition);
 }
 
+.nav-logo-text {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-color);
+    letter-spacing: -0.02em;
+}
+
 .nav-logo:hover {
     transform: scale(1.05);
 }
