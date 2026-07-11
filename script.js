@@ -101,12 +101,13 @@
         );
         await Promise.all(promises);
 
-        // Show button with a fade-in (opacity starts at 0 from CSS)
+        // Show button with slide-up + fade-in
         await new Promise(r => setTimeout(r, 200));
-        button.style.transition = 'opacity 0.4s ease';
+        button.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
                 button.style.opacity = '1';
+                button.style.transform = 'translateY(0)';
             });
         });
 
