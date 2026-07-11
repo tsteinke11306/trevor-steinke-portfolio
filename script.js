@@ -26,12 +26,15 @@
     // Characters to cycle through during scramble (even-width mono set)
     const SCRAMBLE_CHARS = '/\\|-_=+<>~:*';
     const TICK_MS = 50;
+    // How many characters ahead of the cursor are actively scrambling
+    const SCRAMBLE_AHEAD = 3;
 
     function scrambleText(text, resolvedCount) {
         return Array.from(text, (ch, i) => {
             if (ch === ' ') return ' ';
-            if (i < resolvedCount) return ch;
-            return SCRAMBLE_CHARS[(Math.random() * SCRAMBLE_CHARS.length) | 0];
+            if (i < resolvedCount) return ch;           // resolved: show real char
+            if (i >= resolvedCount + SCRAMBLE_AHEAD) return ' ';  // far ahead: blank
+            return SCRAMBLE_CHARS[(Math.random() * SCRAMBLE_CHARS.length) | 0];  // trail: scramble
         }).join('');
     }
 
@@ -101,9 +104,9 @@
 
         const elements = [
             { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 0.5 },
-            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.2 },
-            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.2 },
-            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 0.5 },
+            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.3 },
+            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.3 },
+            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 0.8 },
         ];
 
         // All lines scramble simultaneously (30ms tick for hero, faster cycling)
