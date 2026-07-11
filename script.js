@@ -47,7 +47,7 @@
             el.style.visibility = 'visible';
 
             // Sweep clip-path open (500ms), slightly faster than scramble
-            el.style.transition = 'clip-path 0.5s ease-out';
+            el.style.transition = 'clip-path 0.4s ease-out';
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => {
                     el.style.clipPath = 'inset(0 0% 0 0)';
@@ -103,15 +103,15 @@
         await new Promise(r => setTimeout(r, 200));
 
         const elements = [
-            { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 0.5 },
-            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.3 },
-            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.3 },
-            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 0.8 },
+            { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 0.7 },
+            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.4 },
+            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.4 },
+            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 1.2 },
         ];
 
-        // All lines scramble simultaneously (30ms tick for hero, faster cycling)
+        // All lines scramble simultaneously (25ms tick for hero, faster cycling)
         const promises = elements.map(item =>
-            scrambleElement(item.el, item.text, item.preserveChild, item.charsPerTick, 30)
+            scrambleElement(item.el, item.text, item.preserveChild, item.charsPerTick, 25)
         );
         await Promise.all(promises);
 
