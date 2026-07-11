@@ -111,9 +111,9 @@
             });
         });
 
-        // Scramble the button text (fast - just barely visible)
+        // Scramble the button text (fast but visible, matches clip-path timing)
         const buttonText = button.textContent.trim();
-        await scrambleElement(button, buttonText, false, 3);
+        await scrambleElement(button, buttonText, false, 1);
 
         // Remove typing class
         hero.classList.remove('hero-typing');
