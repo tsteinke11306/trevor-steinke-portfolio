@@ -33,7 +33,7 @@
         }).join('');
     }
 
-    function scrambleElement(el, text, preserveChild) {
+    function scrambleElement(el, text, preserveChild, charsPerTick) {
         return new Promise(resolve => {
             let childToPreserve = null;
             if (preserveChild) {
@@ -49,7 +49,6 @@
                     hold++;
                     if (hold > 3) {
                         clearInterval(id);
-                        // Final: set clean text
                         if (childToPreserve) {
                             el.textContent = '';
                             el.appendChild(childToPreserve);
@@ -60,7 +59,6 @@
                         resolve();
                         return;
                     }
-                    // Show resolved text during hold
                     if (childToPreserve) {
                         el.textContent = '';
                         el.appendChild(childToPreserve);
@@ -71,7 +69,7 @@
                     return;
                 }
 
-                resolved += 0.5;
+                resolved += charsPerTick;
                 const rc = Math.floor(resolved);
                 const scrambled = scrambleText(text, rc);
 
@@ -91,15 +89,15 @@
         await new Promise(r => setTimeout(r, 200));
 
         const elements = [
-            { el: badge, text: badge.textContent.trim(), preserveChild: true },
-            { el: title, text: title.textContent.trim(), preserveChild: false },
-            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false },
-            { el: description, text: description.textContent.trim(), preserveChild: false },
+            { el: badge, text: badge.textContent.trim(), preserveChild: true, charsPerTick: 0.5 },
+            { el: title, text: title.textContent.trim(), preserveChild: false, charsPerTick: 0.5 },
+            { el: subtitle, text: subtitle.textContent.trim(), preserveChild: false, charsPerTick: 0.5 },
+            { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 2 },
         ];
 
         // All lines scramble simultaneously
         const promises = elements.map(item =>
-            scrambleElement(item.el, item.text, item.preserveChild)
+            scrambleElement(item.el, item.text, item.preserveChild, item.charsPerTick)
         );
         await Promise.all(promises);
 
