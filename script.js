@@ -33,7 +33,7 @@
         }).join('');
     }
 
-    function scrambleElement(el, text, preserveChild, charsPerTick) {
+    function scrambleElement(el, text, preserveChild, charsPerTick, tickMs) {
         return new Promise(resolve => {
             let childToPreserve = null;
             if (preserveChild) {
@@ -49,6 +49,7 @@
                 });
             });
 
+            const tick = tickMs || TICK_MS;
             let resolved = 0;
             let hold = 0;
 
@@ -88,7 +89,7 @@
                 } else {
                     el.textContent = scrambled;
                 }
-            }, TICK_MS);
+            }, tick);
         });
     }
 
@@ -103,9 +104,9 @@
             { el: description, text: description.textContent.trim(), preserveChild: false, charsPerTick: 2 },
         ];
 
-        // All lines scramble simultaneously
+        // All lines scramble simultaneously (30ms tick for hero, faster cycling)
         const promises = elements.map(item =>
-            scrambleElement(item.el, item.text, item.preserveChild, item.charsPerTick)
+            scrambleElement(item.el, item.text, item.preserveChild, item.charsPerTick, 30)
         );
         await Promise.all(promises);
 
