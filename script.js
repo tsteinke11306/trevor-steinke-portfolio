@@ -101,7 +101,7 @@
         );
         await Promise.all(promises);
 
-        // Show button with a fade-in
+        // Show button with scramble effect
         await new Promise(r => setTimeout(r, 200));
         button.style.visibility = 'visible';
         button.style.opacity = '0';
@@ -109,6 +109,10 @@
         requestAnimationFrame(() => {
             button.style.opacity = '1';
         });
+
+        // Scramble the button text
+        const buttonText = button.textContent.trim();
+        await scrambleElement(button, buttonText, false, 0.5);
 
         // Remove typing class
         hero.classList.remove('hero-typing');
