@@ -764,9 +764,34 @@ body::before {
     border-top-color: var(--glass-border-highlight);
     border-radius: 16px;
     box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-border-highlight);
-    max-width: 480px;
+    max-width: 720px;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Entry points: two-column grid for public + admin paths */
+.arch-entry-points {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    width: 100%;
+}
+
+.arch-path {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.arch-path-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-light);
+    font-family: var(--font-display);
+    margin-bottom: 4px;
 }
 
 .arch-node {
@@ -814,7 +839,88 @@ body::before {
     line-height: 1;
 }
 
-.arch-services {
+/* Security layer: wide glass bar */
+.arch-security {
+    text-align: center;
+    padding: 16px 32px;
+    background: var(--glass-bg-alt);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    width: 100%;
+    transition: var(--transition);
+}
+
+.arch-security:hover {
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+}
+
+.arch-security .arch-icon {
+    margin-bottom: 4px;
+}
+
+.arch-security h4 {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 2px;
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+}
+
+.arch-security p {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+/* Runtime layer: Docker + Caddy side by side */
+.arch-runtime {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+}
+
+.arch-runtime-item {
+    text-align: center;
+    padding: 16px 24px;
+    background: var(--glass-bg-alt);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    transition: var(--transition);
+}
+
+.arch-runtime-item:hover {
+    border-color: var(--glass-border-hover);
+    transform: translateY(-2px);
+}
+
+.arch-runtime-item .arch-icon {
+    margin-bottom: 4px;
+}
+
+.arch-runtime-item h4 {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 2px;
+    font-family: var(--font-display);
+    letter-spacing: 0.02em;
+}
+
+.arch-runtime-item p {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin: 0;
+}
+
+/* Application services: 2x2 grid of tiles */
+.arch-apps {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
@@ -844,6 +950,15 @@ body::before {
 @media (max-width: 768px) {
     .homelab-arch {
         padding: 20px;
+    }
+
+    .arch-entry-points {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .arch-runtime {
+        grid-template-columns: 1fr;
     }
 }
 
