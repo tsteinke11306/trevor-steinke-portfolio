@@ -102,12 +102,12 @@
     const titles = [
         'AI/ML Research Engineer',
         'AI Security Researcher',
-        'Red Team Operator',
+        'IT Technician',
         'Penetration Tester',
         'Self-Hosted Infrastructure Engineer',
     ];
 
-    // Backspace + retype effect for cycling titles
+    // Backspace effect for cycling titles
     function backspaceTo(el, targetLen, speedMs) {
         return new Promise(resolve => {
             const id = setInterval(() => {
@@ -122,37 +122,21 @@
         });
     }
 
-    function typeText(el, text, speedMs) {
-        return new Promise(resolve => {
-            let i = 0;
-            const id = setInterval(() => {
-                if (i >= text.length) {
-                    clearInterval(id);
-                    resolve();
-                    return;
-                }
-                el.textContent = text.substring(0, i + 1);
-                i++;
-            }, speedMs);
-        });
-    }
-
     async function cycleTitles() {
         let currentIdx = 0;
         const currentText = subtitle.textContent.trim();
-        // Find which title we start at
         const startIdx = titles.findIndex(t => t === currentText);
         currentIdx = startIdx >= 0 ? startIdx : 0;
 
         while (true) {
-            await new Promise(r => setTimeout(r, 5000));
+            await new Promise(r => setTimeout(r, 3000));
             currentIdx = (currentIdx + 1) % titles.length;
             const nextTitle = titles[currentIdx];
 
             // Backspace current title
             await backspaceTo(subtitle, 0, 30);
-            // Type new title
-            await typeText(subtitle, nextTitle, 50);
+            // Type new title with scramble effect
+            await scrambleElement(subtitle, nextTitle, false, 0.4, 25);
         }
     }
 
