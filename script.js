@@ -102,7 +102,7 @@
     const titles = [
         'AI/ML Research Engineer',
         'AI Security Researcher',
-        'IT Technician',
+        'IT Operations Engineer',
         'Penetration Tester',
         'Self-Hosted Infrastructure Engineer',
     ];
