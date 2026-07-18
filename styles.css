@@ -310,6 +310,7 @@ body::before {
     font-weight: 400;
     font-family: var(--font-display);
     letter-spacing: 0.02em;
+    min-height: 1.6em;
 }
 
 .hero-description {
