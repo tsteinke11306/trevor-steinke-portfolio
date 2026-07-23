@@ -101,6 +101,17 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Smooth theme transition for glass cards and UI elements */
+.navbar, .tech-logo, .cert-card, .project-card, .arch-node, .arch-service,
+.btn-primary, .theme-toggle, .availability-badge, .section-title,
+.hero-title, .hero-subtitle, .hero-description, .nav-logo-text,
+.cert-icon, .cert-name, .cert-issuer, .cert-date, .arch-icon,
+.project-title, .project-date, .project-description, .tag,
+.section-eyebrow, .arch-connector, .status-dot {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, fill 0.4s ease, stroke 0.4s ease;
 }
 
 /* Decorative background orbs for glassmorphism blur effect (monochrome) */
@@ -140,6 +151,7 @@ body::before {
     z-index: 1000;
     transform: translateY(-100%);
     animation: nav-sweep-down 0.5s ease-out 2.5s forwards;
+    transition: background 0.4s ease, border-color 0.4s ease;
 }
 
 @keyframes nav-sweep-down {
