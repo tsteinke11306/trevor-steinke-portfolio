@@ -837,6 +837,129 @@ body::before {
 }
 
 /* ============================================
+   Projects rolodex carousel
+   ============================================ */
+.carousel {
+    position: relative;
+    overflow: clip;
+    padding: 8px 0;
+}
+
+.carousel-viewport {
+    overflow: visible;
+}
+
+.carousel-track {
+    display: flex;
+    align-items: stretch;
+    gap: 24px;
+    transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: transform;
+}
+
+.carousel-track .project-card {
+    flex: 0 0 70%;
+    max-width: 70%;
+    opacity: 0.3;
+    transform: scale(0.96);
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+                border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.carousel-track .project-card.is-active {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+}
+
+.car-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    border-top-color: var(--glass-border-highlight);
+    background: var(--menu-bg);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+}
+
+.car-btn:hover {
+    border-color: var(--glass-border-hover);
+    transform: translateY(-50%) scale(1.06);
+}
+
+.car-btn:active {
+    transform: translateY(-50%) scale(0.96);
+}
+
+.car-prev { left: 6px; }
+.car-next { right: 6px; }
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+}
+
+.car-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg-alt);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.car-dot:hover {
+    border-color: var(--glass-border-hover);
+}
+
+.car-dot.is-active {
+    background: var(--text-color);
+    border-color: var(--text-color);
+}
+
+@media (max-width: 768px) {
+    .carousel-track {
+        gap: 12px;
+    }
+
+    .carousel-track .project-card {
+        flex-basis: 84%;
+        max-width: 84%;
+    }
+
+    .car-btn {
+        width: 38px;
+        height: 38px;
+    }
+
+    .car-prev { left: 2px; }
+    .car-next { right: 2px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .carousel-track {
+        transition: none;
+    }
+}
+
+/* ============================================
    Homelab Section
    ============================================ */
 .homelab-intro {

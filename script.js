@@ -400,3 +400,78 @@ window.addEventListener('scroll', () => {
         window.addEventListener('load', trackPageView);
     }
 })();
+
+/* ============================================
+   Projects rolodex carousel
+   ============================================ */
+(function () {
+    const carousel = document.getElementById('projects-carousel');
+    if (!carousel) return;
+    const viewport = carousel.querySelector('.carousel-viewport');
+    const track = carousel.querySelector('.carousel-track');
+    const cards = Array.from(track.children);
+    const prevBtn = carousel.querySelector('.car-prev');
+    const nextBtn = carousel.querySelector('.car-next');
+    const dotsWrap = carousel.querySelector('.carousel-dots');
+    let index = 0;
+
+    cards.forEach((_, i) => {
+        const d = document.createElement('button');
+        d.type = 'button';
+        d.className = 'car-dot';
+        d.setAttribute('aria-label', 'Go to project ' + (i + 1) + ' of ' + cards.length);
+        d.addEventListener('click', () => go(i));
+        dotsWrap.appendChild(d);
+    });
+    const dots = Array.from(dotsWrap.children);
+
+    function go(i) {
+        index = (i + cards.length) % cards.length;  // rolodex wrap
+        const card = cards[index];
+        const x = (viewport.clientWidth - card.offsetWidth) / 2 - card.offsetLeft;
+        track.style.transform = 'translateX(' + x + 'px)';
+        cards.forEach((c, j) => {
+            c.classList.toggle('is-active', j === index);
+            if (j === index) {
+                c.removeAttribute('aria-hidden');
+                c.removeAttribute('inert');
+            } else {
+                c.setAttribute('aria-hidden', 'true');
+                c.setAttribute('inert', '');
+            }
+        });
+        dots.forEach((d, j) => d.classList.toggle('is-active', j === index));
+    }
+
+    prevBtn.addEventListener('click', () => go(index - 1));
+    nextBtn.addEventListener('click', () => go(index + 1));
+
+    function inView() {
+        const r = carousel.getBoundingClientRect();
+        return r.top < window.innerHeight * 0.75 && r.bottom > window.innerHeight * 0.25;
+    }
+    document.addEventListener('keydown', (e) => {
+        if (e.altKey || e.ctrlKey || e.metaKey) return;
+        const t = e.target;
+        if (t && (t.matches('input, textarea, select') || t.isContentEditable)) return;
+        if (!inView()) return;
+        if (e.key === 'ArrowLeft') { go(index - 1); e.preventDefault(); }
+        if (e.key === 'ArrowRight') { go(index + 1); e.preventDefault(); }
+    });
+
+    let x0 = null, y0 = null;
+    viewport.addEventListener('touchstart', (e) => {
+        x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
+    }, { passive: true });
+    viewport.addEventListener('touchend', (e) => {
+        if (x0 === null) return;
+        const dx = e.changedTouches[0].clientX - x0;
+        const dy = e.changedTouches[0].clientY - y0;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(index + (dx < 0 ? 1 : -1));
+        x0 = null;
+    }, { passive: true });
+
+    window.addEventListener('resize', () => go(index));
+    requestAnimationFrame(() => go(0));
+    setTimeout(() => go(index), 700); // re-center after section reveal animation
+})();
