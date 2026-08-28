@@ -402,7 +402,7 @@ window.addEventListener('scroll', () => {
 })();
 
 /* ============================================
-   Projects rolodex carousel
+   Projects 3D revolving carousel
    ============================================ */
 (function () {
     const carousel = document.getElementById('projects-carousel');
@@ -413,26 +413,38 @@ window.addEventListener('scroll', () => {
     const prevBtn = carousel.querySelector('.car-prev');
     const nextBtn = carousel.querySelector('.car-next');
     const dotsWrap = carousel.querySelector('.carousel-dots');
+    const n = cards.length;
+    const step = 360 / n;          // angular slice per card
     let index = 0;
+    let rot = 0;                   // accumulated ring rotation (deg)
+    let radius = 0;
 
     cards.forEach((_, i) => {
         const d = document.createElement('button');
         d.type = 'button';
         d.className = 'car-dot';
-        d.setAttribute('aria-label', 'Go to project ' + (i + 1) + ' of ' + cards.length);
+        d.setAttribute('aria-label', 'Go to project ' + (i + 1) + ' of ' + n);
         d.addEventListener('click', () => go(i));
         dotsWrap.appendChild(d);
     });
     const dots = Array.from(dotsWrap.children);
 
-    function go(i) {
-        index = (i + cards.length) % cards.length;  // rolodex wrap
-        const card = cards[index];
-        const x = (viewport.clientWidth - card.offsetWidth) / 2 - card.offsetLeft;
-        track.style.transform = 'translateX(' + x + 'px)';
-        cards.forEach((c, j) => {
-            c.classList.toggle('is-active', j === index);
-            if (j === index) {
+    // place each card on the cylinder: rotate to its slice, push out by radius
+    function layout() {
+        const w = cards[0].offsetWidth || 420;
+        radius = Math.round((w / 2) / Math.tan(Math.PI / n)) + 34;
+        cards.forEach((c, i) => {
+            c.style.transform = 'rotateY(' + (i * step) + 'deg) translateZ(' + radius + 'px)';
+        });
+    }
+
+    function paint() {
+        cards.forEach((c, i) => {
+            let d = (i - index + n) % n;      // 0..n-1
+            if (d > n / 2) d -= n;            // signed distance from front
+            c.classList.toggle('is-active', d === 0);
+            c.classList.toggle('is-side', Math.abs(d) === 1);
+            if (d === 0) {
                 c.removeAttribute('aria-hidden');
                 c.removeAttribute('inert');
             } else {
@@ -441,6 +453,17 @@ window.addEventListener('scroll', () => {
             }
         });
         dots.forEach((d, j) => d.classList.toggle('is-active', j === index));
+    }
+
+    function go(i) {
+        const target = ((i % n) + n) % n;
+        let d = target - index;               // shortest rotational path
+        if (d > n / 2) d -= n;
+        if (d < -n / 2) d += n;
+        index = target;
+        rot -= d * step;                      // ring counter-rotates to bring card forward
+        track.style.transform = 'rotateY(' + rot + 'deg)';
+        paint();
     }
 
     prevBtn.addEventListener('click', () => go(index - 1));
@@ -471,7 +494,7 @@ window.addEventListener('scroll', () => {
         x0 = null;
     }, { passive: true });
 
-    window.addEventListener('resize', () => go(index));
-    requestAnimationFrame(() => go(0));
-    setTimeout(() => go(index), 700); // re-center after section reveal animation
+    window.addEventListener('resize', () => { layout(); paint(); });
+    requestAnimationFrame(() => { layout(); paint(); });
+    setTimeout(() => { layout(); paint(); }, 700); // re-measure after section reveal
 })();

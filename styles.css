@@ -837,40 +837,65 @@ body::before {
 }
 
 /* ============================================
-   Projects rolodex carousel
+   Projects 3D revolving carousel
    ============================================ */
 .carousel {
     position: relative;
-    overflow: clip;
-    padding: 8px 0;
+    padding: 24px 0 8px;
 }
 
 .carousel-viewport {
-    overflow: visible;
+    perspective: 1500px;
+    perspective-origin: 50% 38%;
+    min-height: 620px;
 }
 
 .carousel-track {
-    display: flex;
-    align-items: stretch;
-    gap: 24px;
-    transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
     will-change: transform;
 }
 
 .carousel-track .project-card {
-    flex: 0 0 70%;
-    max-width: 70%;
-    opacity: 0.3;
-    transform: scale(0.96);
+    position: absolute;
+    left: 50%;
+    top: 28px;
+    width: min(380px, 78vw);
+    margin-left: calc(min(380px, 78vw) / -2);
+    height: 540px;
+    display: flex;
+    flex-direction: column;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    opacity: 0.35;
     pointer-events: none;
-    transition: opacity 0.5s ease, transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
-                border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: opacity 0.55s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.carousel-track .project-card.is-side {
+    opacity: 0.5;
 }
 
 .carousel-track .project-card.is-active {
     opacity: 1;
-    transform: none;
     pointer-events: auto;
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--glass-shadow-hover), inset 0 1px 0 0 var(--glass-border-highlight);
+}
+
+/* keep tag rows pinned to the card foot so taller cards read intentionally */
+.carousel-track .project-card .project-description {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-right: 6px;
+    scrollbar-width: thin;
+}
+
+.carousel-track .project-card .project-tags {
+    margin-top: 12px;
 }
 
 .car-btn {
@@ -935,13 +960,21 @@ body::before {
 }
 
 @media (max-width: 768px) {
-    .carousel-track {
-        gap: 12px;
+    .carousel-viewport {
+        min-height: 640px;
     }
 
     .carousel-track .project-card {
-        flex-basis: 84%;
-        max-width: 84%;
+        height: 560px;
+    }
+
+    .carousel-track .project-card .project-title {
+        font-size: 1.05rem;
+    }
+
+    .carousel-track .project-card .project-header {
+        flex-direction: column;
+        gap: 4px;
     }
 
     .car-btn {
