@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Strix Pentest Report — OWASP Juice Shop v20.1.1</title>
+<title>Strix Pentest Report: OWASP Juice Shop v20.1.1</title>
 <style>
   :root {
     --bg: #0d1117;
@@ -416,19 +416,19 @@
 <!-- ============ TESTED SAFE ============ -->
 <h2>Tested and Confirmed Safe</h2>
 <div class="safe-grid">
-  <div class="safe-item"><strong>SSRF</strong> — Profile image URLs stored but not fetched server-side (OAST confirmed via interactsh)</div>
-  <div class="safe-item"><strong>XXE</strong> — B2B v2 orders does not parse XML body in v20.1.1</div>
-  <div class="safe-item"><strong>RCE</strong> — No command injection vectors found</div>
-  <div class="safe-item"><strong>SSTI</strong> — Track-order character stripping is not template evaluation</div>
-  <div class="safe-item"><strong>Path Traversal</strong> — Express normalizes /ftp/../../../../etc/passwd paths</div>
-  <div class="safe-item"><strong>Source Maps</strong> — Not exposed</div>
+  <div class="safe-item"><strong>SSRF</strong>: Profile image URLs stored but not fetched server-side (OAST confirmed via interactsh)</div>
+  <div class="safe-item"><strong>XXE</strong>: B2B v2 orders does not parse XML body in v20.1.1</div>
+  <div class="safe-item"><strong>RCE</strong>: No command injection vectors found</div>
+  <div class="safe-item"><strong>SSTI</strong>: Track-order character stripping is not template evaluation</div>
+  <div class="safe-item"><strong>Path Traversal</strong>: Express normalizes /ftp/../../../../etc/passwd paths</div>
+  <div class="safe-item"><strong>Source Maps</strong>: Not exposed</div>
 </div>
 
 <!-- ============ METHODOLOGY ============ -->
 <h2>Methodology</h2>
 <p class="meta">Engagement Type: Black-box testing (no source code access) | Scope: http://host.docker.internal:3000 (OWASP Juice Shop v20.1.1) | Frameworks: OWASP WSTG, PTES, OSSTMM</p>
 
-<h3>Phase 1 — Reconnaissance and Attack Surface Mapping</h3>
+<h3>Phase 1: Reconnaissance and Attack Surface Mapping</h3>
 <ul>
   <li>HTTP fingerprinting and technology identification (Node.js, Express, Angular, SQLite, Sequelize ORM)</li>
   <li>API endpoint enumeration via probing and configuration disclosure endpoints</li>
@@ -437,7 +437,7 @@
   <li>Authentication flow analysis (JWT-based, Bearer tokens)</li>
 </ul>
 
-<h3>Phase 2 — Systematic Vulnerability Testing</h3>
+<h3>Phase 2: Systematic Vulnerability Testing</h3>
 <p>Seven specialized testing agents were deployed in parallel, each focusing on a specific vulnerability class:</p>
 
 <div class="method-grid">
@@ -477,10 +477,10 @@
 <!-- ============ ROOT CAUSES ============ -->
 <h2>Systemic Root Causes</h2>
 <div class="root-grid">
-  <div class="root-item"><strong>1.</strong> No SQL parameterization — raw query construction throughout the API</div>
+  <div class="root-item"><strong>1.</strong> No SQL parameterization: raw query construction throughout the API</div>
   <div class="root-item"><strong>2.</strong> Outdated JWT library (express-jwt 0.1.3) with known algorithm confusion vulnerabilities</div>
-  <div class="root-item"><strong>3.</strong> No field whitelisting on POST/PUT endpoints — mass assignment across registration, recycle, and other APIs</div>
-  <div class="root-item"><strong>4.</strong> No ownership verification on IDOR-prone endpoints — basket ID from URL, not from JWT</div>
+  <div class="root-item"><strong>3.</strong> No field whitelisting on POST/PUT endpoints: mass assignment across registration, recycle, and other APIs</div>
+  <div class="root-item"><strong>4.</strong> No ownership verification on IDOR-prone endpoints: basket ID from URL, not from JWT</div>
   <div class="root-item"><strong>5.</strong> bypassSecurityTrustHtml() used unsafely in 9 locations in the Angular frontend</div>
   <div class="root-item"><strong>6.</strong> No concurrency controls on state-changing operations</div>
   <div class="root-item"><strong>7.</strong> Weak password hashing (unsalted MD5)</div>
