@@ -112,6 +112,25 @@
                     <p>Based in <strong>McBain, Michigan</strong>, I'm always looking for opportunities to expand my skills in AI security, red teaming, and self-hosted infrastructure hardening.</p>
                 </div>
             </div>
+
+            <div class="stat-strip">
+                <div class="stat-item">
+                    <span class="stat-number">26</span>
+                    <span class="stat-label">Validated Findings</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">7</span>
+                    <span class="stat-label">Vuln Classes</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">40+</span>
+                    <span class="stat-label">Subdomains Probed</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">25+</span>
+                    <span class="stat-label">Bounty Targets</span>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -201,6 +220,7 @@
             <h2 class="section-title"><span class="section-eyebrow">Cloud Admin</span>Microsoft 365 Administration</h2>
             <div class="skills-grid">
                 <div class="skill-category">
+                    <div class="skill-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="4.5"/><path d="m10.8 12.2 9.7-9.7M15 8l2.8 2.8M17.5 5.5l2 2"/></svg></div>
                     <h3 class="skill-category-title">Identity & Access</h3>
                     <ul class="skill-list">
                         <li>Entra ID (User/Group Management)</li>
@@ -209,6 +229,7 @@
                     </ul>
                 </div>
                 <div class="skill-category">
+                    <div class="skill-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></div>
                     <h3 class="skill-category-title">Exchange Online</h3>
                     <ul class="skill-list">
                         <li>Mailbox Management</li>
@@ -217,6 +238,7 @@
                     </ul>
                 </div>
                 <div class="skill-category">
+                    <div class="skill-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
                     <h3 class="skill-category-title">Device Management</h3>
                     <ul class="skill-list">
                         <li>Microsoft Intune</li>
@@ -225,6 +247,7 @@
                     </ul>
                 </div>
                 <div class="skill-category">
+                    <div class="skill-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg></div>
                     <h3 class="skill-category-title">Licensing & Admin</h3>
                     <ul class="skill-list">
                         <li>License Assignment & Management</li>
@@ -247,6 +270,11 @@
                         <span class="project-date">Personal Project</span>
                     </div>
                     <p class="project-description">Configured an open-source multi-agent AI pentesting system (Strix) with GLM-5.2 (753B MoE) via an OpenAI-compatible API. Benchmarked against Claude Code and Opus 4.8 (Semgrep IDOR: 39% F1 vs 32%; CyBT-CTF: 28/59 tied with Opus), then ran a black-box assessment of OWASP Juice Shop producing 26 validated findings across 7 vulnerability classes (5 critical, 5 high, 16 medium) with full remediation report aligned to OWASP WSTG/PTES/OSSTMM.</p>
+                    <div class="project-stats">
+                        <span class="pstat"><strong>26</strong> findings</span>
+                        <span class="pstat"><strong>7</strong> classes</span>
+                        <span class="pstat"><strong>5</strong> critical</span>
+                    </div>
                     <div class="project-tags">
                         <span class="tag">AI Pentesting</span>
                         <span class="tag">GLM-5.2</span>
@@ -373,6 +401,28 @@
                         <path class="diag-line diag-dash" d="M 170 478 L 279 505"/>
                         <path class="diag-line diag-thin" d="M 552 520 L 588 520"/>
                         <path class="diag-line diag-thin" d="M 640 545 C 560 570 350 578 176 590"/>
+                    </g>
+
+                    <!-- animated packets traveling the flows -->
+                    <g class="diag-flows">
+                        <circle class="diag-flow" r="2.6">
+                            <animateMotion dur="4s" repeatCount="indefinite" path="M 170 57 L 246 57"/>
+                        </circle>
+                        <circle class="diag-flow" r="2.6">
+                            <animateMotion dur="5.5s" begin="1.4s" repeatCount="indefinite" path="M 170 72 C 220 72 222 223 279 223"/>
+                        </circle>
+                        <circle class="diag-flow" r="2.6">
+                            <animateMotion dur="4.5s" begin="2.8s" repeatCount="indefinite" path="M 373 252 L 373 370"/>
+                        </circle>
+                        <circle class="diag-flow" r="2.6">
+                            <animateMotion dur="5s" begin="3.6s" repeatCount="indefinite" path="M 170 267 L 486 267"/>
+                        </circle>
+                        <circle class="diag-flow diag-flow-hostile" r="2.6">
+                            <animateMotion dur="4s" begin="0.6s" repeatCount="indefinite" path="M 170 478 L 279 505"/>
+                        </circle>
+                        <circle class="diag-flow" r="2.2">
+                            <animateMotion dur="4s" begin="2s" repeatCount="indefinite" path="M 640 545 C 560 570 350 578 176 590"/>
+                        </circle>
                     </g>
                     <text class="diag-label" x="208" y="152">HTTPS</text>
                     <text class="diag-label" x="290" y="260">WireGuard tunnel</text>
@@ -637,16 +687,16 @@
                     <p class="cert-date">Multi-Agent Pentesting</p>
                 </div>
                 <div class="cert-card">
-                    <div class="cert-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M.3013 17.6146c-.1299-.3387-.5228-1.5119-.1337-2.4314l9.8273 5.6738a.329.329 0 0 0 .3299 0L24 12.9616v2.3542l-13.8401 7.9906-9.8586-5.6918zM.1911 8.9628c-.2882.8769.0149 2.0581.1236 2.4261l9.8452 5.6841L24 9.0823V6.7275L10.3248 14.623a.329.329 0 0 1-.3299 0L.1911 8.9628zm13.1698-1.9361c-.1819.1113-.4394.0015-.4852-.2064l-.2805-1.1336-2.1254-.1752a.33.33 0 0 1-.1378-.6145l5.5782-3.2207-1.7021-.9826L.6979 8.4935l9.462 5.463 13.5104-7.8004-4.401-2.5407-5.9084 3.4113zm-.1821-1.7286.2321.938 5.1984-3.0014-2.0395-1.1775-4.994 2.8834 1.3099.108a.3302.3302 0 0 1 .2931.2495zM24 9.845l-13.6752 7.8954a.329.329 0 0 1-.3299 0L.1678 12.0667c-.3891.919.003 2.0914.1332 2.4311l9.8589 5.692L24 12.1993V9.845z"/></svg></div>
+                    <div class="cert-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></div>
                     <h3 class="cert-name">NIST Compliance Automation</h3>
                     <p class="cert-issuer">FlowPress</p>
                     <p class="cert-date">Industrial Calibration</p>
                 </div>
                 <div class="cert-card">
-                    <div class="cert-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.236L19.5 8 12 11.764 4.5 8 12 4.236zM4 9.5l7 3.5v7.382l-7-3.5V9.5zm9 10.882V13l7-3.5v7.382l-7 3.5z"/></svg></div>
+                    <div class="cert-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="3" width="7.5" height="7.5" rx="1"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1"/></svg></div>
                     <h3 class="cert-name">Microsoft Cloud and AI Security Engineer Associate</h3>
                     <p class="cert-issuer">Microsoft Certified</p>
-                    <p class="cert-date">Currently Pursuing</p>
+                    <p class="cert-date"><span class="cert-pursuing"><span class="pulse-dot"></span>Currently Pursuing</span></p>
                 </div>
             </div>
         </div>
