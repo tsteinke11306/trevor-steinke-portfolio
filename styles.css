@@ -1021,6 +1021,32 @@ body::before {
     }
 }
 
+
+/* compact ring variant (homelab cards are shorter) */
+.carousel-compact {
+    min-height: 500px;
+}
+
+.carousel-compact .project-card {
+    height: 430px;
+    top: 12px;
+}
+
+.carousel-compact .project-description {
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .carousel-compact {
+        min-height: 540px;
+    }
+
+    .carousel-compact .project-card {
+        height: 470px;
+    }
+}
+
 /* ============================================
    Homelab Section
    ============================================ */
