@@ -107,12 +107,12 @@ body {
 }
 
 /* Smooth theme transition for glass cards and UI elements */
-.navbar, .tech-logo, .cert-card, .project-card, .arch-node, .arch-service,
+.navbar, .tech-logo, .cert-card, .project-card,
 .btn-primary, .theme-toggle, .availability-badge, .section-title,
 .hero-title, .hero-subtitle, .hero-description, .nav-logo-text,
-.cert-icon, .cert-name, .cert-issuer, .cert-date, .arch-icon,
+.cert-icon, .cert-name, .cert-issuer, .cert-date,
 .project-title, .project-date, .project-description, .tag,
-.section-eyebrow, .arch-connector, .status-dot {
+.section-eyebrow, .status-dot {
     transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, fill 0.4s ease, stroke 0.4s ease;
 }
 
@@ -776,13 +776,18 @@ body::before {
     line-height: 1.7;
 }
 
+.homelab-intro {
+    text-align: center;
+    color: var(--text-light);
+    max-width: 720px;
+    margin: 0 auto 48px;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+}
+
 .homelab-arch {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
     margin-bottom: 64px;
-    padding: 32px;
+    padding: 28px 24px;
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -790,201 +795,140 @@ body::before {
     border-top-color: var(--glass-border-highlight);
     border-radius: 16px;
     box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-border-highlight);
-    max-width: 720px;
+    max-width: 820px;
     margin-left: auto;
     margin-right: auto;
 }
 
-/* Entry points: two-column grid for public + admin paths */
-.arch-entry-points {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+.homelab-svg {
     width: 100%;
-}
-
-.arch-path {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-}
-
-.arch-path-label {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--text-light);
-    font-family: var(--font-display);
-    margin-bottom: 4px;
-}
-
-.arch-node {
-    text-align: center;
-    padding: 16px 24px;
-    background: var(--glass-bg-alt);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    width: 100%;
-    transition: var(--transition);
-}
-
-.arch-node:hover {
-    border-color: var(--glass-border-hover);
-    transform: translateY(-2px);
-}
-
-.arch-icon {
-    font-size: 1.75rem;
-    margin-bottom: 4px;
+    height: auto;
+    display: block;
     color: var(--text-color);
-    line-height: 1;
 }
 
-.arch-node h4 {
-    font-size: 0.9375rem;
-    font-weight: 700;
-    color: var(--text-color);
-    margin-bottom: 2px;
+/* diagram primitives - all theme-aware via CSS vars */
+.diag-box {
+    fill: var(--glass-bg-alt);
+    stroke: var(--text-color);
+    stroke-opacity: 0.28;
+    stroke-width: 1;
+    transition: stroke-opacity 0.3s ease, stroke 0.3s ease;
+}
+
+.diag-chipbox {
+    fill: var(--glass-bg-alt);
+    stroke: var(--text-color);
+    stroke-opacity: 0.22;
+    stroke-width: 1;
+    transition: stroke-opacity 0.3s ease;
+}
+
+.diag-boundary {
+    fill: var(--glass-bg);
+    stroke: var(--text-color);
+    stroke-opacity: 0.35;
+    stroke-width: 1.5;
+    rx: 14;
+}
+
+.diag-zone {
+    fill: none;
+    stroke: var(--text-color);
+    stroke-opacity: 0.3;
+    stroke-width: 1;
+    stroke-dasharray: 6 4;
+}
+
+.diag-zone-trap {
+    stroke-opacity: 0.45;
+}
+
+.diag-line {
+    stroke: var(--text-color);
+    stroke-opacity: 0.5;
+    stroke-width: 1.2;
+    fill: none;
+}
+
+.diag-dash {
+    stroke-dasharray: 5 4;
+    stroke-opacity: 0.42;
+}
+
+.diag-thin {
+    stroke-width: 1;
+    stroke-opacity: 0.3;
+}
+
+.diag-name {
     font-family: var(--font-display);
+    font-size: 11.5px;
+    font-weight: 700;
+    fill: var(--text-color);
     letter-spacing: 0.02em;
 }
 
-.arch-node p {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    margin: 0;
-}
-
-.arch-connector {
-    font-size: 1.25rem;
-    color: var(--text-light);
-    line-height: 1;
-}
-
-/* Security layer: wide glass bar */
-.arch-security {
-    text-align: center;
-    padding: 16px 32px;
-    background: var(--glass-bg-alt);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    width: 100%;
-    transition: var(--transition);
-}
-
-.arch-security:hover {
-    border-color: var(--glass-border-hover);
-    transform: translateY(-2px);
-}
-
-.arch-security .arch-icon {
-    margin-bottom: 4px;
-}
-
-.arch-security h4 {
-    font-size: 0.9375rem;
+.diag-chipname {
+    font-family: var(--font-display);
+    font-size: 9px;
     font-weight: 700;
-    color: var(--text-color);
-    margin-bottom: 2px;
-    font-family: var(--font-display);
+    fill: var(--text-color);
     letter-spacing: 0.02em;
 }
 
-.arch-security p {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    margin: 0;
+.diag-sub {
+    font-family: var(--font-body);
+    font-size: 9px;
+    fill: var(--text-light);
 }
 
-/* Runtime layer: Docker + Caddy side by side */
-.arch-runtime {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    width: 100%;
-}
-
-.arch-runtime-item {
-    text-align: center;
-    padding: 16px 24px;
-    background: var(--glass-bg-alt);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    transition: var(--transition);
-}
-
-.arch-runtime-item:hover {
-    border-color: var(--glass-border-hover);
-    transform: translateY(-2px);
-}
-
-.arch-runtime-item .arch-icon {
-    margin-bottom: 4px;
-}
-
-.arch-runtime-item h4 {
-    font-size: 0.9375rem;
+.diag-zone-title {
+    font-family: var(--font-display);
+    font-size: 10px;
     font-weight: 700;
-    color: var(--text-color);
-    margin-bottom: 2px;
-    font-family: var(--font-display);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.1em;
+    fill: var(--text-color);
 }
 
-.arch-runtime-item p {
-    font-size: 0.8rem;
-    color: var(--text-light);
-    margin: 0;
+.diag-label {
+    font-family: var(--font-body);
+    font-size: 8.5px;
+    font-style: italic;
+    fill: var(--text-light);
 }
 
-/* Application services: 2x2 grid of tiles */
-.arch-apps {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    width: 100%;
+.diag-node:hover > .diag-box,
+.diag-node:hover > .diag-chipbox {
+    stroke-opacity: 0.85;
 }
 
-.arch-service {
-    text-align: center;
-    padding: 10px 12px;
-    background: var(--glass-bg-alt);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text-color);
-    transition: var(--transition);
-    font-family: var(--font-display);
-    letter-spacing: 0.02em;
+.diag-pulse {
+    animation: diag-pulse 2.4s ease-in-out infinite;
 }
 
-.arch-service:hover {
-    border-color: var(--glass-border-hover);
+@keyframes diag-pulse {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .diag-pulse { animation: none; }
+}
+
+/* keep the diagram legible on small screens: horizontal scroll instead of shrink */
+.diag-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.homelab-svg {
+    min-width: 620px;
 }
 
 @media (max-width: 768px) {
     .homelab-arch {
-        padding: 20px;
-    }
-
-    .arch-entry-points {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-
-    .arch-runtime {
-        grid-template-columns: 1fr;
+        padding: 16px 12px;
     }
 }
 
