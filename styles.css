@@ -847,7 +847,7 @@ body::before {
 .carousel-viewport {
     perspective: 1500px;
     perspective-origin: 50% 38%;
-    min-height: 620px;
+    min-height: 700px;
 }
 
 .carousel-track {
@@ -862,9 +862,9 @@ body::before {
     position: absolute;
     left: 50%;
     top: 28px;
-    width: min(380px, 78vw);
-    margin-left: calc(min(380px, 78vw) / -2);
-    height: 540px;
+    width: min(360px, 78vw);
+    margin-left: calc(min(360px, 78vw) / -2);
+    height: 620px;
     display: flex;
     flex-direction: column;
     backface-visibility: hidden;
@@ -875,7 +875,17 @@ body::before {
 }
 
 .carousel-track .project-card.is-side {
-    opacity: 0.5;
+    opacity: 0.45;
+    filter: blur(2px);
+    transition: opacity 0.55s ease, filter 0.55s ease;
+}
+
+.carousel-track .project-card {
+    filter: none;
+}
+
+.carousel-track .project-card.is-active {
+    filter: none;
 }
 
 .carousel-track .project-card.is-active {
@@ -885,13 +895,24 @@ body::before {
     box-shadow: var(--glass-shadow-hover), inset 0 1px 0 0 var(--glass-border-highlight);
 }
 
-/* keep tag rows pinned to the card foot so taller cards read intentionally */
+/* carousel-scoped density: fit full descriptions without scrolling */
+.carousel-track .project-card {
+    padding: 20px 22px;
+}
+
+.carousel-track .project-card .project-title {
+    font-size: 1.05rem;
+}
+
 .carousel-track .project-card .project-description {
-    overflow-y: auto;
+    font-size: 0.875rem;
+    line-height: 1.5;
     flex: 1 1 auto;
     min-height: 0;
-    padding-right: 6px;
-    scrollbar-width: thin;
+}
+
+.carousel-track .project-card .project-header {
+    margin-bottom: 10px;
 }
 
 .carousel-track .project-card .project-tags {
@@ -965,7 +986,15 @@ body::before {
     }
 
     .carousel-track .project-card {
-        height: 560px;
+        height: 620px;
+    }
+
+    /* narrow card can't fit full text at readable size: scroll within the
+       description on mobile only; desktop fits everything with no scroll */
+    .carousel-track .project-card .project-description {
+        overflow-y: auto;
+        font-size: 0.8125rem;
+        -webkit-overflow-scrolling: touch;
     }
 
     .carousel-track .project-card .project-title {

@@ -462,7 +462,7 @@ window.addEventListener('scroll', () => {
         if (d < -n / 2) d += n;
         index = target;
         rot -= d * step;                      // ring counter-rotates to bring card forward
-        track.style.transform = 'rotateY(' + rot + 'deg)';
+        track.style.transform = 'translateZ(-' + radius + 'px) rotateY(' + rot + 'deg)';
         paint();
     }
 
@@ -494,7 +494,8 @@ window.addEventListener('scroll', () => {
         x0 = null;
     }, { passive: true });
 
-    window.addEventListener('resize', () => { layout(); paint(); });
-    requestAnimationFrame(() => { layout(); paint(); });
-    setTimeout(() => { layout(); paint(); }, 700); // re-measure after section reveal
+    function refresh() { layout(); go(index); }   // re-measure and re-apply ring transform
+    window.addEventListener('resize', refresh);
+    requestAnimationFrame(refresh);
+    setTimeout(refresh, 700); // re-measure after section reveal
 })();
