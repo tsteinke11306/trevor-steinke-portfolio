@@ -356,7 +356,7 @@
 
 <div class="homelab-arch">
                 <div class="diag-scroll">
-                <svg class="homelab-svg" viewBox="0 0 760 622" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Homelab architecture: visitors reach GitHub Pages and the public contact API; attackers are trapped by the SSH honeypot; admin devices reach private services over the Tailscale mesh.">
+                <svg class="homelab-svg" viewBox="0 0 760 622" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Homelab architecture: visitors reach GitHub Pages and the public contact API; attackers are trapped by the SSH honeypot; honeypot activity triggers ntfy push alerts; admin devices reach private services over the Tailscale mesh.">
                     <defs>
                         <marker id="diag-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
                             <path d="M0,0 L10,5 L0,10 z" fill="currentColor" fill-opacity="0.6"/>
@@ -371,12 +371,14 @@
                         <path class="diag-line" d="M 373 336 L 373 368"/>
                         <path class="diag-line diag-dash" d="M 170 267 L 486 267"/>
                         <path class="diag-line diag-dash" d="M 170 478 L 279 505"/>
-                        <path class="diag-line diag-dash diag-thin" d="M 285 546 L 176 576"/>
+                        <path class="diag-line diag-thin" d="M 552 520 L 588 520"/>
+                        <path class="diag-line diag-thin" d="M 640 545 C 560 570 350 578 176 590"/>
                     </g>
                     <text class="diag-label" x="208" y="152">HTTPS</text>
                     <text class="diag-label" x="290" y="260">WireGuard tunnel</text>
                     <text class="diag-label" x="188" y="470">attack traffic :22 / :2223</text>
-                    <text class="diag-label" x="196" y="552">ntfy alerts + digest</text>
+                    <text class="diag-label" x="554" y="511">logs</text>
+                    <text class="diag-label" x="300" y="600">APNs relay</text>
 
                     <!-- ===== actors ===== -->
                     <g class="diag-node">
@@ -411,12 +413,12 @@
                     <g class="diag-node">
                         <rect class="diag-box" x="285" y="196" width="176" height="54" rx="10"/>
                         <text class="diag-name" x="373" y="219" text-anchor="middle">Caddy</text>
-                        <text class="diag-sub" x="373" y="236" text-anchor="middle">reverse proxy &#183; TLS</text>
+                        <text class="diag-sub" x="373" y="236" text-anchor="middle">reverse proxy &#183; TLS &#183; :8443</text>
                     </g>
                     <g class="diag-node">
                         <rect class="diag-box" x="285" y="286" width="176" height="50" rx="10"/>
                         <text class="diag-name" x="373" y="308" text-anchor="middle">Contact API</text>
-                        <text class="diag-sub" x="373" y="324" text-anchor="middle">Node.js &#183; :8443</text>
+                        <text class="diag-sub" x="373" y="324" text-anchor="middle">Node.js API</text>
                     </g>
                     <g class="diag-node">
                         <rect class="diag-box" x="285" y="374" width="176" height="50" rx="10"/>
@@ -453,28 +455,35 @@
                     <text class="diag-label" x="606" y="410" text-anchor="middle">patching + audits</text>
 
                     <!-- honeypot zone -->
-                    <rect class="diag-zone diag-zone-trap" x="285" y="464" width="430" height="96" rx="12"/>
+                    <rect class="diag-zone diag-zone-trap" x="285" y="464" width="265" height="96" rx="12"/>
                     <text class="diag-zone-title" x="299" y="486">SSH HONEYPOT</text>
-                    <text class="diag-sub" x="299" y="500">isolated Docker net &#183; egress-restricted iptables</text>
+                    <text class="diag-sub" x="299" y="500">isolated net &#183; egress-blocked &#183; JSONL analysis</text>
                     <g class="diag-node">
-                        <rect class="diag-chipbox" x="340" y="508" width="150" height="40" rx="8"/>
-                        <text class="diag-chipname" x="415" y="525" text-anchor="middle">Endlessh</text>
-                        <text class="diag-sub" x="415" y="540" text-anchor="middle">:22 tarpit</text>
+                        <rect class="diag-chipbox" x="297" y="508" width="118" height="40" rx="8"/>
+                        <text class="diag-chipname" x="356" y="525" text-anchor="middle">Endlessh</text>
+                        <text class="diag-sub" x="356" y="540" text-anchor="middle">:22 tarpit</text>
                     </g>
                     <g class="diag-node">
-                        <rect class="diag-chipbox" x="510" y="508" width="150" height="40" rx="8"/>
-                        <text class="diag-chipname" x="585" y="525" text-anchor="middle">Cowrie</text>
-                        <text class="diag-sub" x="585" y="540" text-anchor="middle">:2223 fake shell</text>
+                        <rect class="diag-chipbox" x="423" y="508" width="118" height="40" rx="8"/>
+                        <text class="diag-chipname" x="482" y="525" text-anchor="middle">Cowrie</text>
+                        <text class="diag-sub" x="482" y="540" text-anchor="middle">:2223 fake shell</text>
                     </g>
-                    <circle class="diag-pulse" cx="700" cy="480" r="4" fill="currentColor">
+                    <circle class="diag-pulse" cx="536" cy="480" r="4" fill="currentColor">
                         <title>Live tarpit: attackers held here</title>
                     </circle>
+
+                    <!-- ntfy: self-hosted push server on the VPS -->
+                    <g class="diag-node">
+                        <rect class="diag-box" x="590" y="495" width="125" height="50" rx="10"/>
+                        <text class="diag-name" x="652" y="516" text-anchor="middle">ntfy</text>
+                        <text class="diag-sub" x="652" y="533" text-anchor="middle">:9121 &#183; push server</text>
+                    </g>
 
                     <!-- ntfy destination (outside VPS) -->
                     <g class="diag-node">
                         <rect class="diag-box" x="18" y="556" width="152" height="50" rx="10"/>
                         <text class="diag-name" x="94" y="578" text-anchor="middle">iPhone</text>
-                        <text class="diag-sub" x="94" y="594" text-anchor="middle">ntfy push</text>
+                        <text class="diag-sub" x="94" y="594" text-anchor="middle">push alerts</text>
                     </g>
 
                     <!-- legend -->
@@ -483,6 +492,8 @@
                         <text class="diag-label" x="298" y="615">public HTTPS</text>
                         <line class="diag-line diag-dash" x1="390" y1="612" x2="430" y2="612"/>
                         <text class="diag-label" x="436" y="615">WireGuard / attack traffic</text>
+                        <line class="diag-line diag-thin" x1="590" y1="612" x2="630" y2="612"/>
+                        <text class="diag-label" x="636" y="615">internal / push</text>
                     </g>
                 </svg>
                 </div>
