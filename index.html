@@ -112,25 +112,6 @@
                     <p>Based in <strong>McBain, Michigan</strong>, I'm always looking for opportunities to expand my skills in AI security, red teaming, and self-hosted infrastructure hardening.</p>
                 </div>
             </div>
-
-            <div class="stat-strip">
-                <div class="stat-item">
-                    <span class="stat-number">26</span>
-                    <span class="stat-label">Validated Findings</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">7</span>
-                    <span class="stat-label">Vuln Classes</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">40+</span>
-                    <span class="stat-label">Subdomains Probed</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">25+</span>
-                    <span class="stat-label">Bounty Targets</span>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -403,25 +384,35 @@
                         <path class="diag-line diag-thin" d="M 640 545 C 560 570 350 578 176 590"/>
                     </g>
 
-                    <!-- animated packets traveling the flows -->
+                    <!-- animated packets traveling the flows (fade in/out each cycle) -->
                     <g class="diag-flows">
-                        <circle class="diag-flow" r="2.6">
+                        <circle class="diag-flow" r="2.6" opacity="0">
                             <animateMotion dur="4s" repeatCount="indefinite" path="M 170 57 L 246 57"/>
+                            <animate attributeName="opacity" values="0;0.65;0.65;0" keyTimes="0;0.15;0.8;1" dur="4s" repeatCount="indefinite"/>
                         </circle>
-                        <circle class="diag-flow" r="2.6">
+                        <circle class="diag-flow" r="2.6" opacity="0">
                             <animateMotion dur="5.5s" begin="1.4s" repeatCount="indefinite" path="M 170 72 C 220 72 222 223 279 223"/>
+                            <animate attributeName="opacity" values="0;0.65;0.65;0" keyTimes="0;0.15;0.8;1" dur="5.5s" begin="1.4s" repeatCount="indefinite"/>
                         </circle>
-                        <circle class="diag-flow" r="2.6">
-                            <animateMotion dur="4.5s" begin="2.8s" repeatCount="indefinite" path="M 373 252 L 373 370"/>
+                        <circle class="diag-flow" r="2.6" opacity="0">
+                            <animateMotion dur="1.8s" begin="2.8s" repeatCount="indefinite" path="M 373 252 L 373 282"/>
+                            <animate attributeName="opacity" values="0;0.65;0.65;0" keyTimes="0;0.2;0.75;1" dur="1.8s" begin="2.8s" repeatCount="indefinite"/>
                         </circle>
-                        <circle class="diag-flow" r="2.6">
+                        <circle class="diag-flow" r="2.6" opacity="0">
+                            <animateMotion dur="1.8s" begin="4.6s" repeatCount="indefinite" path="M 373 338 L 373 372"/>
+                            <animate attributeName="opacity" values="0;0.65;0.65;0" keyTimes="0;0.2;0.75;1" dur="1.8s" begin="4.6s" repeatCount="indefinite"/>
+                        </circle>
+                        <circle class="diag-flow" r="2.6" opacity="0">
                             <animateMotion dur="5s" begin="3.6s" repeatCount="indefinite" path="M 170 267 L 486 267"/>
+                            <animate attributeName="opacity" values="0;0.65;0.65;0" keyTimes="0;0.15;0.8;1" dur="5s" begin="3.6s" repeatCount="indefinite"/>
                         </circle>
-                        <circle class="diag-flow diag-flow-hostile" r="2.6">
+                        <circle class="diag-flow diag-flow-hostile" r="2.6" opacity="0">
                             <animateMotion dur="4s" begin="0.6s" repeatCount="indefinite" path="M 170 478 L 279 505"/>
+                            <animate attributeName="opacity" values="0;0.4;0.4;0" keyTimes="0;0.15;0.8;1" dur="4s" begin="0.6s" repeatCount="indefinite"/>
                         </circle>
-                        <circle class="diag-flow" r="2.2">
+                        <circle class="diag-flow" r="2.2" opacity="0">
                             <animateMotion dur="4s" begin="2s" repeatCount="indefinite" path="M 640 545 C 560 570 350 578 176 590"/>
+                            <animate attributeName="opacity" values="0;0.65;0.65;0" keyTimes="0;0.15;0.8;1" dur="4s" begin="2s" repeatCount="indefinite"/>
                         </circle>
                     </g>
                     <text class="diag-label" x="208" y="152">HTTPS</text>
