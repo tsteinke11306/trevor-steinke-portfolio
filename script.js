@@ -414,23 +414,65 @@ window.addEventListener('scroll', () => {
     const MAXD = 3;   // neighbors visible per side
     const GAP_DESKTOP = 440;
     const DRAWER_SHIFT = 190;   // px the rail slides left when a drawer is open
+    const DETAIL_EXTRA = 190;   // extra slide when the detail panel opens beside it (three-column)
 
-    /* ---------- drawer data (add new findings here) ---------- */
+    /* ---------- drawer data (add new findings here) ----------
+       item: { title, sev, meta, link, body: [paragraphs] }
+       sev: Critical | High | Medium | Low | Info (chip tint follows) */
     const DRAWER_DATA = {
         'recon-findings': {
             items: [
-                { title: 'Cross-user session context disclosure in PDF Spaces', sev: 'High', meta: 'Adobe · Intigriti · CVSS 7.1', link: null },
-                { title: 'GraphQL schema mapping via error-message inference', sev: 'Info', meta: 'HackerOne · recon technique', link: null },
-                { title: 'F5 BigIP load balancer bypass attempts', sev: 'Info', meta: 'HackerOne · edge probing', link: null },
-                { title: 'API endpoint enumeration across 40+ subdomains', sev: 'Info', meta: 'HackerOne · content discovery', link: null }
+                {
+                    title: 'Cross-user session context disclosure in PDF Spaces',
+                    sev: 'High',
+                    meta: 'Adobe · Intigriti · CVSS 7.1',
+                    link: null,
+                    body: [
+                        'The chat_session_id parameter in PDF Spaces assistant endpoints was not validated against the authenticated user. Replaying a chat_session_id issued to account B while authenticated as account A returned account B\'s assistant session, including its persisted memory and context.',
+                        'Confirmed with a two-account test: per-session memory was verified with a canary value, then fully readable after the cross-account swap. Reported with reproduction steps and scored CVSS 7.1 (High).',
+                        'Submitted to Intigriti on Sep 3, 2026. Triage expected Sep 9-10.'
+                    ]
+                },
+                {
+                    title: 'GraphQL schema mapping via error-message inference',
+                    sev: 'Info',
+                    meta: 'HackerOne · recon technique',
+                    link: null,
+                    body: [
+                        'Mapped an undocumented GraphQL schema on a live program without introspection: probed suspected field names and used type-error messages to infer object shapes, building a field map across multiple types and their relationships.',
+                        'Documented as a recon technique; the resulting map fed directly into endpoint and object-level authorization testing.'
+                    ]
+                },
+                {
+                    title: 'F5 BigIP load balancer bypass attempts',
+                    sev: 'Info',
+                    meta: 'HackerOne · edge probing',
+                    link: null,
+                    body: [
+                        'Probed the target\'s edge layer for known F5 BIG-IP behaviors: persistence-cookie decoding to fingerprint pool topology, and header/routing quirks that sometimes allow requests to skip WAF rules.',
+                        'No exploitable exposure confirmed on this target. Kept as edge-layer recon notes for follow-up rounds.'
+                    ]
+                },
+                {
+                    title: 'API endpoint enumeration across 40+ subdomains',
+                    sev: 'Info',
+                    meta: 'HackerOne · content discovery',
+                    link: null,
+                    body: [
+                        'Content-discovery pass across 40+ resolved subdomains: passive sources (subfinder, historical URL data), active DNS permutations, and httpx probing to build a live endpoint inventory.',
+                        'Undocumented API routes from that inventory were then probed for authentication gaps and object-level access weaknesses. Results feed the ongoing engagement\'s testing lanes.'
+                    ]
+                }
             ]
         }
     };
 
-    function renderDrawerItems(listEl, data) {
-        data.items.forEach((it) => {
-            const f = document.createElement('div');
+    function renderDrawerItems(listEl, data, onOpen) {
+        data.items.forEach((it, idx) => {
+            const f = document.createElement('button');
+            f.type = 'button';
             f.className = 'finding';
+            f.setAttribute('aria-haspopup', 'dialog');
             const sev = document.createElement('span');
             sev.className = 'finding-sev s-' + it.sev.toLowerCase();
             sev.textContent = it.sev;
@@ -457,6 +499,10 @@ window.addEventListener('scroll', () => {
                 }
                 f.appendChild(m);
             }
+            f.addEventListener('click', (e) => {
+                e.stopPropagation();
+                onOpen(idx);
+            });
             listEl.appendChild(f);
         });
     }
@@ -480,6 +526,8 @@ window.addEventListener('scroll', () => {
         let backdrop = null;
         let shiftCur = 0;           // animated rail shift (drawer push)
         let shiftTarget = 0;
+        let detailOpen = false;     // detail panel state (inside open drawer)
+        let detailItems = null;     // findings array of the open drawer
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         /* ---------- a11y parity with the old ring ---------- */
@@ -583,8 +631,10 @@ window.addEventListener('scroll', () => {
             if (!drawerCard) return;
             const c = drawerCard;
             drawerCard = null;
+            detailOpen = false;
+            detailItems = null;
             shiftTarget = 0;
-            c.classList.remove('card-drawer-open');
+            c.classList.remove('card-drawer-open', 'card-detail-open');
             const btn = c.querySelector('[data-drawer-open]');
             const panel = c.querySelector('.car-drawer');
             if (btn) btn.setAttribute('aria-expanded', 'false');
@@ -597,9 +647,12 @@ window.addEventListener('scroll', () => {
             if (drawerCard === card) return;
             closeDrawer();
             drawerCard = card;
+            detailOpen = false;
+            detailItems = null;
             const wide = window.innerWidth > 900;
             shiftTarget = wide ? -DRAWER_SHIFT : 0;
             card.classList.add('card-drawer-open');
+            card.classList.remove('card-detail-open');
             const btn = card.querySelector('[data-drawer-open]');
             const panel = card.querySelector('.car-drawer');
             if (btn) btn.setAttribute('aria-expanded', 'true');
@@ -614,6 +667,67 @@ window.addEventListener('scroll', () => {
             queue();
         }
 
+        function closeDetail() {
+            if (!detailOpen || !drawerCard) return;
+            detailOpen = false;
+            drawerCard.classList.remove('card-detail-open');
+            const panel = drawerCard.querySelector('.car-drawer');
+            const detail = drawerCard.querySelector('.car-detail');
+            if (panel) panel.setAttribute('aria-hidden', 'false');
+            if (detail) detail.setAttribute('aria-hidden', 'true');
+            queue();
+        }
+
+        function openDetail(idx) {
+            if (!drawerCard) return;
+            const card = drawerCard;
+            const panel = card.querySelector('.car-drawer');
+            if (!panel) return;
+            const key = panel.id;
+            const data = DRAWER_DATA[key];
+            if (!data || !data.items[idx]) return;
+            detailItems = data.items;
+            const it = data.items[idx];
+            const detail = card.querySelector('.car-detail');
+            if (!detail) return;
+
+            // render body
+            const bodyEl = detail.querySelector('[data-detail-body]');
+            bodyEl.textContent = '';
+            const h = detail.querySelector('[data-detail-title]');
+            h.textContent = it.title;
+            const sevEl = detail.querySelector('[data-detail-sev]');
+            sevEl.className = 'finding-sev s-' + it.sev.toLowerCase();
+            sevEl.textContent = it.sev;
+            const metaEl = detail.querySelector('[data-detail-meta]');
+            metaEl.textContent = '';
+            if (it.meta) metaEl.textContent = it.meta;
+            it.body.forEach((para) => {
+                const p = document.createElement('p');
+                p.textContent = para;
+                bodyEl.appendChild(p);
+            });
+            const linkRow = detail.querySelector('[data-detail-linkrow]');
+            linkRow.textContent = '';
+            if (it.link) {
+                const a = document.createElement('a');
+                a.className = 'tag tag-link';
+                a.href = it.link;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                a.textContent = 'Open reference \u2192';
+                linkRow.appendChild(a);
+            }
+
+            detailOpen = true;
+            const wide = window.innerWidth > 1024;
+            shiftTarget = wide ? -(DRAWER_SHIFT + DETAIL_EXTRA) : -DRAWER_SHIFT;
+            card.classList.add('card-detail-open');
+            panel.setAttribute('aria-hidden', 'true');
+            detail.setAttribute('aria-hidden', 'false');
+            queue();
+        }
+
         cards.forEach((card) => {
             const openBtn = card.querySelector('[data-drawer-open]');
             if (!openBtn) return;
@@ -621,7 +735,7 @@ window.addEventListener('scroll', () => {
             if (panel) {
                 const list = panel.querySelector('[data-drawer-list]');
                 const key = panel.id;
-                if (list && DRAWER_DATA[key]) renderDrawerItems(list, DRAWER_DATA[key]);
+                if (list && DRAWER_DATA[key]) renderDrawerItems(list, DRAWER_DATA[key], openDetail);
             }
             openBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -629,10 +743,17 @@ window.addEventListener('scroll', () => {
             });
             const closeBtn = card.querySelector('[data-drawer-close]');
             if (closeBtn) closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeDrawer(); });
+            const backBtn = card.querySelector('[data-detail-back]');
+            if (backBtn) backBtn.addEventListener('click', (e) => { e.stopPropagation(); closeDetail(); });
+            const detailCloseBtn = card.querySelector('[data-detail-close]');
+            if (detailCloseBtn) detailCloseBtn.addEventListener('click', (e) => { e.stopPropagation(); closeDrawer(); });
         });
 
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && drawerCard) closeDrawer();
+            if (e.key === 'Escape') {
+                if (detailOpen) closeDetail();
+                else if (drawerCard) closeDrawer();
+            }
         });
 
         /* ---------- pointer drag with momentum ----------
@@ -693,7 +814,9 @@ window.addEventListener('scroll', () => {
             if (moved > 6) { e.preventDefault(); e.stopPropagation(); return; }
             if (drawerCard) {
                 // clicks inside the open drawer's card are its own; elsewhere: close
-                if (!drawerCard.contains(e.target)) { closeDrawer(); }
+                if (!drawerCard.contains(e.target)) {
+                    if (detailOpen) closeDetail(); else closeDrawer();
+                }
                 return;
             }
             const vr = viewport.getBoundingClientRect();
@@ -722,7 +845,10 @@ window.addEventListener('scroll', () => {
         window.addEventListener('resize', () => {
             if (drawerCard) {
                 const wide = window.innerWidth > 900;
-                shiftTarget = wide ? -DRAWER_SHIFT : 0;
+                const wideDetail = window.innerWidth > 1024;
+                shiftTarget = detailOpen
+                    ? (wideDetail ? -(DRAWER_SHIFT + DETAIL_EXTRA) : -DRAWER_SHIFT)
+                    : (wide ? -DRAWER_SHIFT : 0);
                 if (backdrop) backdrop.classList.toggle('on', !wide);
             }
             render();

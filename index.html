@@ -295,6 +295,25 @@
                         <h4>Bug Bounty Findings</h4>
                         <div class="drawer-scroll" data-drawer-list></div>
                     </aside>
+                    <aside class="car-detail" aria-hidden="true" role="dialog" aria-label="Finding detail">
+                        <button type="button" class="car-drawer-close" data-detail-close aria-label="Close finding">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                        </button>
+                        <button type="button" class="d-nav" data-detail-back>
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                            All findings
+                        </button>
+                        <div class="car-detail-head">
+                            <h4>Detail</h4>
+                        </div>
+                        <div class="d-title" data-detail-title></div>
+                        <div class="d-sevrow">
+                            <span class="finding-sev" data-detail-sev></span>
+                            <span class="d-meta" data-detail-meta></span>
+                        </div>
+                        <div data-detail-body></div>
+                        <div data-detail-linkrow></div>
+                    </aside>
                 </div>
                 <div class="project-card">
                     <div class="project-header">

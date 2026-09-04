@@ -950,11 +950,12 @@ body::before {
     margin-top: 12px;
     padding: 8px 16px;
     border-radius: 999px;
-    border: 1px solid var(--glass-border);
-    background: var(--glass-bg-alt);
-    color: var(--text-color);
+    border: 1px solid var(--primary-color);
+    background: var(--primary-color);
+    color: var(--bg-color);
     font-family: var(--font-display);
     font-size: 0.72rem;
+    font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
     cursor: pointer;
@@ -962,8 +963,10 @@ body::before {
 }
 
 .car-drawer-btn:hover {
-    border-color: var(--glass-border-hover);
-    background: var(--glass-bg-hover);
+    opacity: 0.82;
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--bg-color);
 }
 
 .car-drawer-btn .chev {
@@ -1076,14 +1079,65 @@ body::before {
     white-space: nowrap;
 }
 
-.finding-sev.s-critical, .finding-sev.s-high {
-    color: var(--text-color);
-    border-color: var(--glass-border-hover);
-    background: rgba(255, 255, 255, 0.07);
+/* subtle severity tints (theme-aware, low saturation) */
+.finding-sev.s-critical {
+    color: #e5484d;
+    border-color: rgba(229, 72, 77, 0.45);
+    background: rgba(229, 72, 77, 0.10);
 }
 
-[data-theme="light"] .finding-sev.s-critical, [data-theme="light"] .finding-sev.s-high {
-    background: rgba(0, 0, 0, 0.06);
+.finding-sev.s-high {
+    color: #f76b15;
+    border-color: rgba(247, 107, 21, 0.40);
+    background: rgba(247, 107, 21, 0.08);
+}
+
+.finding-sev.s-medium {
+    color: #d4a72c;
+    border-color: rgba(212, 167, 44, 0.40);
+    background: rgba(212, 167, 44, 0.08);
+}
+
+.finding-sev.s-low {
+    color: #46a758;
+    border-color: rgba(70, 167, 88, 0.40);
+    background: rgba(70, 167, 88, 0.08);
+}
+
+.finding-sev.s-info {
+    color: #8e8ea8;
+    border-color: rgba(142, 142, 168, 0.35);
+    background: rgba(142, 142, 168, 0.07);
+}
+
+[data-theme="light"] .finding-sev.s-critical {
+    color: #b3383c;
+    border-color: rgba(179, 56, 60, 0.4);
+    background: rgba(179, 56, 60, 0.07);
+}
+
+[data-theme="light"] .finding-sev.s-high {
+    color: #b45309;
+    border-color: rgba(180, 83, 9, 0.38);
+    background: rgba(180, 83, 9, 0.06);
+}
+
+[data-theme="light"] .finding-sev.s-medium {
+    color: #8a6d0b;
+    border-color: rgba(138, 109, 11, 0.38);
+    background: rgba(138, 109, 11, 0.07);
+}
+
+[data-theme="light"] .finding-sev.s-low {
+    color: #2f7a3e;
+    border-color: rgba(47, 122, 62, 0.38);
+    background: rgba(47, 122, 62, 0.07);
+}
+
+[data-theme="light"] .finding-sev.s-info {
+    color: #6b6b80;
+    border-color: rgba(107, 107, 128, 0.32);
+    background: rgba(107, 107, 128, 0.06);
 }
 
 .finding-meta {
@@ -1097,6 +1151,155 @@ body::before {
     color: var(--text-color);
     text-decoration: none;
     border-bottom: 1px solid var(--glass-border-hover);
+}
+
+.finding {
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font-family: var(--font-body);
+    transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+}
+
+.finding:hover {
+    border-color: var(--glass-border-hover);
+    background: var(--glass-bg-hover);
+    transform: translateX(2px);
+}
+
+.finding:focus-visible {
+    outline: 2px solid var(--glass-border-hover);
+    outline-offset: 2px;
+}
+
+/* detail panel (second slide-out) */
+.car-detail {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(100% + 22px);
+    width: 340px;
+    background: var(--menu-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow-hover), inset 0 1px 0 0 var(--glass-border-highlight);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-18px);
+    transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s linear 0.32s;
+    z-index: 220;
+}
+
+.project-card.card-detail-open .car-detail {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.project-card.card-detail-open .car-drawer {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(14px);
+    transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s linear 0.28s;
+}
+
+.car-detail-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 6px;
+    padding-right: 36px;
+}
+
+.car-detail h4 {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin: 0 0 10px;
+}
+
+.car-detail .d-title {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+.car-detail .d-sevrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.car-detail .d-meta {
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    color: var(--text-light);
+}
+
+.car-detail [data-detail-body] {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.car-detail [data-detail-body] p {
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: #c9c9c9;
+    margin-bottom: 12px;
+}
+
+[data-theme="light"] .car-detail [data-detail-body] p {
+    color: #444444;
+}
+
+.car-detail [data-detail-linkrow] {
+    padding-top: 12px;
+}
+
+.car-detail .d-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding: 4px 0;
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.car-detail .d-nav:hover {
+    color: var(--text-color);
+}
+
+/* narrow screens: detail overlays in the drawer's slot */
+@media (max-width: 1024px) {
+    .car-detail {
+        left: 12px;
+        right: 12px;
+        width: auto;
+        transform: translateY(14px);
+    }
+
+    .project-card.card-detail-open .car-detail {
+        transform: translateY(0);
+    }
 }
 
 /* backdrop for narrow screens */
