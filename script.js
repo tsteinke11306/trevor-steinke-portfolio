@@ -402,103 +402,195 @@ window.addEventListener('scroll', () => {
 })();
 
 /* ============================================
-   3D revolving carousels
+   Motion Rail carousels (drag + momentum, 3D lite)
+   Replaces the rotateY ring: neighbors stay readable,
+   strip is draggable with a fling, wraps infinitely.
    ============================================ */
-function initRing(id, opts) {
-    const carousel = document.getElementById(id);
-    if (!carousel) return;
-    const compact = opts && opts.compact;
-    const viewport = carousel.querySelector('.carousel-viewport');
-    const track = carousel.querySelector('.carousel-track');
-    const cards = Array.from(track.children);
-    const prevBtn = carousel.querySelector('.car-prev');
-    const nextBtn = carousel.querySelector('.car-next');
-    const dotsWrap = carousel.querySelector('.carousel-dots');
-    const n = cards.length;
-    const step = 360 / n;
-    let index = 0;
-    let rot = 0;
-    let radius = 0;
+(function () {
+    'use strict';
 
-    cards.forEach((_, i) => {
-        const d = document.createElement('button');
-        d.type = 'button';
-        d.className = 'car-dot';
-        d.setAttribute('aria-label', 'Go to card ' + (i + 1) + ' of ' + n);
-        d.addEventListener('click', () => go(i));
-        dotsWrap.appendChild(d);
-    });
-    const dots = Array.from(dotsWrap.children);
+    const MAXD = 3;   // neighbors visible per side
+    const GAP_DESKTOP = 440;
 
-    function layout() {
-        const w = cards[0].offsetWidth || 360;
-        radius = Math.round((w / 2) / Math.tan(Math.PI / n)) + (compact ? 26 : 34);
+    function initRail(id, opts) {
+        const carousel = document.getElementById(id);
+        if (!carousel) return;
+        const compact = !!(opts && opts.compact);
+        const viewport = carousel.querySelector('.carousel-viewport');
+        const track = carousel.querySelector('.carousel-track');
+        const cards = Array.from(track.children);
+        const dotsWrap = carousel.querySelector('.carousel-dots');
+        const ticker = document.getElementById((opts && opts.tickerId) || '');
+        const n = cards.length;
+        if (!n) return;
+
+        let pos = 0;        // float position (animated)
+        let target = 0;     // index the spring is heading to
+        let raf = null;
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        /* ---------- a11y parity with the old ring ---------- */
         cards.forEach((c, i) => {
-            c.style.transform = 'rotateY(' + (i * step) + 'deg) translateZ(' + radius + 'px)';
+            const d = document.createElement('button');
+            d.type = 'button';
+            d.className = 'car-dot';
+            d.setAttribute('aria-label', 'Go to card ' + (i + 1) + ' of ' + n);
+            d.addEventListener('click', () => { go(i); sync(false); });
+            dotsWrap.appendChild(d);
         });
-    }
+        const dots = Array.from(dotsWrap.children);
+        viewport.setAttribute('aria-roledescription', 'carousel');
+        if (!viewport.getAttribute('aria-label')) viewport.setAttribute('aria-label', 'Card carousel');
 
-    function paint() {
-        cards.forEach((c, i) => {
-            let d = (i - index + n) % n;
+        function wrapDist(d) {
+            d = ((d % n) + n) % n;
             if (d > n / 2) d -= n;
-            c.classList.toggle('is-active', d === 0);
-            c.classList.toggle('is-side', Math.abs(d) === 1);
-            if (d === 0) {
-                c.removeAttribute('aria-hidden');
-                c.removeAttribute('inert');
+            return d;
+        }
+
+        function gap() {
+            if (window.innerWidth < 768) return Math.round(window.innerWidth * 0.84);
+            return compact ? 450 : GAP_DESKTOP;
+        }
+
+        function render() {
+            for (let i = 0; i < n; i++) {
+                const d = wrapDist(i - pos);
+                const ad = Math.abs(d);
+                const c = cards[i];
+                const rz = Math.max(-1, Math.min(1, d)) * -14;   // deg, toward center
+                const z = -Math.min(ad, MAXD) * 170;             // push back
+                const o = ad >= MAXD + 0.5 ? 0 : 1 - (ad / (MAXD + 0.6)) * 0.75;
+                const bl = ad <= 0.5 ? 0 : Math.min((ad - 0.5) * 2.2, 4);
+                c.style.transform = 'translate3d(' + (d * gap()) + 'px,' + (ad * 14) + 'px,' + z + 'px) rotateY(' + rz + 'deg)';
+                c.style.opacity = o.toFixed(3);
+                c.style.filter = bl ? 'blur(' + bl.toFixed(2) + 'px)' : 'none';
+                c.style.zIndex = String(100 - Math.round(ad * 10));
+                const active = ad <= 0.5;
+                c.classList.toggle('is-active', active);
+                // visible cards must accept clicks (click-to-center) and drags;
+                // only fully faded cards beyond the visibility horizon opt out
+                c.style.pointerEvents = ad <= MAXD ? 'auto' : 'none';
+                if (active) {
+                    c.removeAttribute('aria-hidden');
+                    c.removeAttribute('inert');
+                } else {
+                    c.setAttribute('aria-hidden', 'true');
+                    c.setAttribute('inert', '');
+                }
+            }
+            const cur = ((Math.round(pos) % n) + n) % n;
+            dots.forEach((d, j) => d.classList.toggle('is-active', j === cur));
+            if (ticker) ticker.textContent = cards[cur].querySelector('.project-title').textContent;
+        }
+
+        function loop() {
+            raf = null;
+            pos += (target - pos) * 0.14;
+            if (Math.abs(target - pos) < 0.0005) pos = target;
+            render();
+            if (pos !== target) raf = requestAnimationFrame(loop);
+        }
+
+        function queue() { if (!raf) raf = requestAnimationFrame(loop); }
+
+        function sync(scrollImmediate) {
+            if (reduceMotion && scrollImmediate) {
+                // native snap row: bring the active card into view manually
+                const cur = ((target % n) + n) % n;
+                cards[cur].scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'auto' });
+                render();
+                return;
+            }
+            queue();
+        }
+
+        function go(i) {
+            target = Math.round(target) + wrapDist(i - Math.round(target));
+            sync(true);
+        }
+
+        /* ---------- pointer drag with momentum ----------
+           No setPointerCapture: it would retarget the post-release click to the
+           viewport, killing click-to-center on side cards. Window-level
+           move/up listeners give the same drag continuity. */
+        let dragging = false, moved = 0, lastX = 0, vel = 0, lastT = 0, startTarget = 0;
+
+        function onMove(e) {
+            if (!dragging) return;
+            const dx = e.clientX - lastX;
+            const dt = Math.max(1, e.timeStamp - lastT);
+            lastX = e.clientX;
+            lastT = e.timeStamp;
+            moved += Math.abs(dx);
+            vel = 0.8 * vel + 0.2 * (dx / dt);        // px/ms, smoothed
+            target -= dx / gap();
+            const floor = startTarget - 2, ceil = startTarget + 2;
+            target = Math.max(floor, Math.min(ceil, target));
+            queue();
+        }
+
+        function onUp() {
+            if (!dragging) return;
+            dragging = false;
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            window.removeEventListener('pointercancel', onUp);
+            viewport.classList.remove('dragging');
+            if (moved > 6) {
+                // momentum: ~180ms of carried velocity, at most 2 cards of throw
+                let t = Math.round(target - (vel * 180) / gap());
+                t = Math.max(Math.round(target) - 2, Math.min(Math.round(target) + 2, t));
+                target = t;
             } else {
-                c.setAttribute('aria-hidden', 'true');
-                c.setAttribute('inert', '');
+                target = Math.round(target);
+            }
+            queue();
+        }
+
+        viewport.addEventListener('pointerdown', (e) => {
+            if (reduceMotion) return;                 // native scroll instead
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            dragging = true; moved = 0; lastX = e.clientX; vel = 0; lastT = e.timeStamp;
+            startTarget = Math.round(target);
+            viewport.classList.add('dragging');
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp);
+            window.addEventListener('pointercancel', onUp);
+        });
+
+        // a drag is not a click: suppress link activation after real drags.
+        // Click-to-center is geometric: side cards carry `inert` (a11y parity
+        // with the old ring, no tab stops) so they are invisible to
+        // hit-testing; map the click x back to a card index instead.
+        viewport.addEventListener('click', (e) => {
+            if (moved > 6) { e.preventDefault(); e.stopPropagation(); return; }
+            const vr = viewport.getBoundingClientRect();
+            const d = Math.round((e.clientX - (vr.left + vr.width / 2)) / gap());
+            if (d !== 0 && Math.abs(d) <= MAXD) {
+                e.preventDefault();
+                go(Math.round(target) + d);
             }
         });
-        dots.forEach((d, j) => d.classList.toggle('is-active', j === index));
+
+        /* ---------- keyboard (matches old ring behavior) ---------- */
+        function inView() {
+            const r = carousel.getBoundingClientRect();
+            return r.top < window.innerHeight * 0.75 && r.bottom > window.innerHeight * 0.25;
+        }
+        document.addEventListener('keydown', (e) => {
+            if (e.altKey || e.ctrlKey || e.metaKey) return;
+            const t = e.target;
+            if (t && t instanceof Element && (t.matches('input, textarea, select') || t.isContentEditable)) return;
+            if (!inView()) return;
+            if (e.key === 'ArrowLeft') { go(Math.round(target) - 1); e.preventDefault(); }
+            if (e.key === 'ArrowRight') { go(Math.round(target) + 1); e.preventDefault(); }
+        });
+
+        window.addEventListener('resize', () => { render(); });
+        render();
     }
 
-    function go(i) {
-        const target = ((i % n) + n) % n;
-        let d = target - index;
-        if (d > n / 2) d -= n;
-        if (d < -n / 2) d += n;
-        index = target;
-        rot -= d * step;
-        track.style.transform = 'translateZ(-' + radius + 'px) rotateY(' + rot + 'deg)';
-        paint();
-    }
-
-    prevBtn.addEventListener('click', () => go(index - 1));
-    nextBtn.addEventListener('click', () => go(index + 1));
-
-    function inView() {
-        const r = carousel.getBoundingClientRect();
-        return r.top < window.innerHeight * 0.75 && r.bottom > window.innerHeight * 0.25;
-    }
-    document.addEventListener('keydown', (e) => {
-        if (e.altKey || e.ctrlKey || e.metaKey) return;
-        const t = e.target;
-        if (t && (t.matches('input, textarea, select') || t.isContentEditable)) return;
-        if (!inView()) return;
-        if (e.key === 'ArrowLeft') { go(index - 1); e.preventDefault(); }
-        if (e.key === 'ArrowRight') { go(index + 1); e.preventDefault(); }
-    });
-
-    let x0 = null, y0 = null;
-    viewport.addEventListener('touchstart', (e) => {
-        x0 = e.touches[0].clientX; y0 = e.touches[0].clientY;
-    }, { passive: true });
-    viewport.addEventListener('touchend', (e) => {
-        if (x0 === null) return;
-        const dx = e.changedTouches[0].clientX - x0;
-        const dy = e.changedTouches[0].clientY - y0;
-        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(index + (dx < 0 ? 1 : -1));
-        x0 = null;
-    }, { passive: true });
-
-    function refresh() { layout(); go(index); }
-    window.addEventListener('resize', refresh);
-    requestAnimationFrame(refresh);
-    setTimeout(refresh, 700);
-}
-
-initRing('projects-carousel');
-initRing('homelab-carousel', { compact: true });
+    initRail('projects-carousel', { tickerId: 'projects-ticker' });
+    initRail('homelab-carousel', { compact: true, tickerId: 'homelab-ticker' });
+})();
