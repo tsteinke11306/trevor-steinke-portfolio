@@ -222,9 +222,9 @@
                     <div class="skill-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg></div>
                     <h3 class="skill-category-title">Device Management</h3>
                     <ul class="skill-list">
-                        <li>Microsoft Intune</li>
-                        <li>Device Compliance Policies</li>
-                        <li>App Deployment</li>
+                        <li>Windows Imaging & Deployment (MDT)</li>
+                        <li>Group Policy Management</li>
+                        <li>Device Compliance & Configuration</li>
                     </ul>
                 </div>
                 <div class="skill-category">
@@ -273,7 +273,7 @@
                         <h3 class="project-title">Automated Bug Bounty Recon Pipeline</h3>
                         <span class="project-date">Personal Project</span>
                     </div>
-                    <p class="project-description">Built a continuous reconnaissance pipeline for bug bounty program discovery and target enumeration. A scheduled scanner (cron, 8am/8pm ET) monitors bbradar.io and Bugcrowd for newly launched programs, filters for web2 targets, and sends email + SMS alerts via msmtp when new programs go live. On-demand deep recon uses subfinder, httpx, nuclei, katana, ffuf, and nmap for subdomain enumeration, service fingerprinting, and content discovery. Active engagement on a HackerOne program with GraphQL schema mapping through error-message inference, load balancer (F5 BigIP) bypass attempts, and API endpoint probing across 40+ subdomains.</p>
+                    <p class="project-description">Built a continuous reconnaissance pipeline for bug bounty program discovery and target enumeration. A scheduled scanner (cron, 8am/8pm ET) monitors bbradar.io, HackerOne, Bugcrowd, and Intigriti (authenticated researcher API) for newly launched programs, filters for web2 targets, and sends email (msmtp) + push (self-hosted ntfy) alerts when new programs go live. On-demand deep recon uses subfinder, httpx, nuclei, katana, ffuf, and nmap for subdomain enumeration, service fingerprinting, and content discovery. Active engagement on a HackerOne program with GraphQL schema mapping through error-message inference, load balancer (F5 BigIP) bypass attempts, and API endpoint probing across 40+ subdomains.</p>
                     <div class="project-tags">
                         <span class="tag">Recon Automation</span>
                         <span class="tag">Bash</span>
@@ -531,7 +531,7 @@
                     </g>
                     <g class="diag-node">
                         <rect class="diag-chipbox" x="558" y="312" width="96" height="28" rx="6"/>
-                        <text class="diag-chipname" x="606" y="330" text-anchor="middle">FileBrowser</text>
+                        <text class="diag-chipname" x="606" y="330" text-anchor="middle">ntfy push</text>
                     </g>
                     <text class="diag-label" x="606" y="366" text-anchor="middle">no public ports &#183; identity-based ACLs</text>
                     <text class="diag-label" x="606" y="398" text-anchor="middle">Hermes agents automate</text>
@@ -635,7 +635,7 @@
                         <h3 class="project-title">Containerized Service Management</h3>
                         <span class="project-date">Docker / systemd</span>
                     </div>
-                    <p class="project-description">Deployed and manage multiple Docker containers on the VPS including qBittorrent and FileBrowser. Services are network-isolated, accessed exclusively through Tailscale mesh VPN. Managed via systemd with proper user isolation and resource controls.</p>
+                    <p class="project-description">Deployed and manage a fleet of self-hosted services in Docker: Sonarr, Radarr, Prowlarr, Jellyfin, Vaultwarden, ntfy, and FlareSolverr, alongside qBittorrent running bare-metal under systemd with a dedicated service account. Services are network-isolated and accessed exclusively through the Tailscale mesh VPN, with resource controls and least-privilege users.</p>
                     <div class="project-tags">
                         <span class="tag">Docker</span>
                         <span class="tag">systemd</span>
@@ -689,7 +689,7 @@
                         <h3 class="project-title">Honeypot Stack (Endlessh + Cowrie)</h3>
                         <span class="project-date">Docker / Ubuntu</span>
                     </div>
-                    <p class="project-description">Deployed a multi-layer SSH honeypot for intrusion detection and threat intelligence. Endlessh tarpits attackers on port 22 while Cowrie captures attacks on port 2223 with a fake emulated shell. Isolated Docker network with egress-restricted iptables rules, automated JSONL log analysis, SMS alerting via msmtp, and weekly digest emails with attack summaries and source IP analysis.</p>
+                    <p class="project-description">Deployed a multi-layer SSH honeypot for intrusion detection and threat intelligence. Endlessh tarpits attackers on port 22 while Cowrie captures attacks on port 2223 with a fake emulated shell. Isolated Docker network with egress-restricted iptables rules, automated JSONL log analysis, real-time push alerting via self-hosted ntfy, and weekly digest emails with attack summaries and source IP analysis.</p>
                     <div class="project-tags">
                         <span class="tag">Docker</span>
                         <span class="tag">Security</span>
