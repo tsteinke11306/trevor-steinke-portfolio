@@ -414,7 +414,6 @@ window.addEventListener('scroll', () => {
     const MAXD = 3;   // neighbors visible per side
     const GAP_DESKTOP = 440;
     const DRAWER_SHIFT = 190;   // px the rail slides left when a drawer is open
-    const DETAIL_EXTRA = 190;   // extra slide when the detail panel opens beside it (three-column)
 
     /* ---------- drawer data (add new findings here) ----------
        item: { title, sev, meta, link, body: [paragraphs] }
@@ -720,8 +719,9 @@ window.addEventListener('scroll', () => {
             }
 
             detailOpen = true;
-            const wide = window.innerWidth > 1024;
-            shiftTarget = wide ? -(DRAWER_SHIFT + DETAIL_EXTRA) : -DRAWER_SHIFT;
+            // rail stays at DRAWER_SHIFT: the detail panel widens to the right
+            // instead of the whole composition sliding further left
+            shiftTarget = window.innerWidth > 900 ? -DRAWER_SHIFT : 0;
             card.classList.add('card-detail-open');
             panel.setAttribute('aria-hidden', 'true');
             detail.setAttribute('aria-hidden', 'false');
@@ -845,10 +845,8 @@ window.addEventListener('scroll', () => {
         window.addEventListener('resize', () => {
             if (drawerCard) {
                 const wide = window.innerWidth > 900;
-                const wideDetail = window.innerWidth > 1024;
-                shiftTarget = detailOpen
-                    ? (wideDetail ? -(DRAWER_SHIFT + DETAIL_EXTRA) : -DRAWER_SHIFT)
-                    : (wide ? -DRAWER_SHIFT : 0);
+                // rail shift is the same for list and detail states; panel widens instead
+                shiftTarget = wide ? -DRAWER_SHIFT : 0;
                 if (backdrop) backdrop.classList.toggle('on', !wide);
             }
             render();

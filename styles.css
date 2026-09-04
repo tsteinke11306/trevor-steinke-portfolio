@@ -1172,13 +1172,14 @@ body::before {
     outline-offset: 2px;
 }
 
-/* detail panel (second slide-out) */
+/* detail panel (second slide-out): same left anchor as the list, wider —
+   drilling in grows the pane to the right instead of sliding the rail again */
 .car-detail {
     position: absolute;
     top: 0;
     bottom: 0;
     left: calc(100% + 22px);
-    width: 340px;
+    width: 460px;
     background: var(--menu-bg);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
