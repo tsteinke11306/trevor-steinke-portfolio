@@ -939,6 +939,196 @@ body::before {
     margin-top: 24px;
 }
 
+/* ============================================
+   Card slide-out drawer (findings sub-menu)
+   Opens from the active card; rail shifts left.
+   ============================================ */
+.car-drawer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg-alt);
+    color: var(--text-color);
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.car-drawer-btn:hover {
+    border-color: var(--glass-border-hover);
+    background: var(--glass-bg-hover);
+}
+
+.car-drawer-btn .chev {
+    display: inline-block;
+    transition: transform 0.3s ease;
+}
+
+.card-drawer-open .car-drawer-btn .chev {
+    transform: rotate(180deg);
+}
+
+.car-drawer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(100% + 22px);
+    width: 340px;
+    background: var(--menu-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow-hover), inset 0 1px 0 0 var(--glass-border-highlight);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-18px);
+    transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0s linear 0.32s;
+    z-index: 200;
+}
+
+.project-card.card-drawer-open .car-drawer {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.car-drawer-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg-alt);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.car-drawer-close:hover {
+    border-color: var(--glass-border-hover);
+}
+
+.car-drawer h4 {
+    font-family: var(--font-display);
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 16px;
+    padding-right: 36px;
+}
+
+.car-drawer .drawer-scroll {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 4px;
+}
+
+.finding {
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: var(--glass-bg-alt);
+}
+
+.finding-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.finding-title {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-color);
+    line-height: 1.35;
+}
+
+.finding-sev {
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    color: var(--text-light);
+    white-space: nowrap;
+}
+
+.finding-sev.s-critical, .finding-sev.s-high {
+    color: var(--text-color);
+    border-color: var(--glass-border-hover);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+[data-theme="light"] .finding-sev.s-critical, [data-theme="light"] .finding-sev.s-high {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.finding-meta {
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    color: var(--text-light);
+    margin-top: 4px;
+}
+
+.finding-meta a {
+    color: var(--text-color);
+    text-decoration: none;
+    border-bottom: 1px solid var(--glass-border-hover);
+}
+
+/* backdrop for narrow screens */
+.car-drawer-backdrop {
+    position: absolute;
+    inset: 0;
+    z-index: 150;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.car-drawer-backdrop.on {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (max-width: 900px) {
+    /* drawer becomes a full overlay of the stage */
+    .car-drawer {
+        left: 12px;
+        right: 12px;
+        width: auto;
+        transform: translateY(14px);
+    }
+
+    .project-card.card-drawer-open .car-drawer {
+        transform: translateY(0);
+    }
+}
+
 .car-dot {
     width: 8px;
     height: 8px;

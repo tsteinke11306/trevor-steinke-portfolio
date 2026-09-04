@@ -405,12 +405,61 @@ window.addEventListener('scroll', () => {
    Motion Rail carousels (drag + momentum, 3D lite)
    Replaces the rotateY ring: neighbors stay readable,
    strip is draggable with a fling, wraps infinitely.
+   Cards can expose a slide-out drawer (sub-menu)
+   that shifts the rail left while open.
    ============================================ */
 (function () {
     'use strict';
 
     const MAXD = 3;   // neighbors visible per side
     const GAP_DESKTOP = 440;
+    const DRAWER_SHIFT = 190;   // px the rail slides left when a drawer is open
+
+    /* ---------- drawer data (add new findings here) ---------- */
+    const DRAWER_DATA = {
+        'recon-findings': {
+            items: [
+                { title: 'Cross-user session context disclosure in PDF Spaces', sev: 'High', meta: 'Adobe · Intigriti · CVSS 7.1', link: null },
+                { title: 'GraphQL schema mapping via error-message inference', sev: 'Info', meta: 'HackerOne · recon technique', link: null },
+                { title: 'F5 BigIP load balancer bypass attempts', sev: 'Info', meta: 'HackerOne · edge probing', link: null },
+                { title: 'API endpoint enumeration across 40+ subdomains', sev: 'Info', meta: 'HackerOne · content discovery', link: null }
+            ]
+        }
+    };
+
+    function renderDrawerItems(listEl, data) {
+        data.items.forEach((it) => {
+            const f = document.createElement('div');
+            f.className = 'finding';
+            const sev = document.createElement('span');
+            sev.className = 'finding-sev s-' + it.sev.toLowerCase();
+            sev.textContent = it.sev;
+            const head = document.createElement('div');
+            head.className = 'finding-head';
+            const t = document.createElement('span');
+            t.className = 'finding-title';
+            t.textContent = it.title;
+            head.appendChild(t);
+            head.appendChild(sev);
+            f.appendChild(head);
+            if (it.meta || it.link) {
+                const m = document.createElement('div');
+                m.className = 'finding-meta';
+                if (it.link) {
+                    const a = document.createElement('a');
+                    a.href = it.link;
+                    a.textContent = it.meta || 'link';
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    m.appendChild(a);
+                } else {
+                    m.textContent = it.meta;
+                }
+                f.appendChild(m);
+            }
+            listEl.appendChild(f);
+        });
+    }
 
     function initRail(id, opts) {
         const carousel = document.getElementById(id);
@@ -427,6 +476,10 @@ window.addEventListener('scroll', () => {
         let pos = 0;        // float position (animated)
         let target = 0;     // index the spring is heading to
         let raf = null;
+        let drawerCard = null;      // card whose drawer is open
+        let backdrop = null;
+        let shiftCur = 0;           // animated rail shift (drawer push)
+        let shiftTarget = 0;
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         /* ---------- a11y parity with the old ring ---------- */
@@ -454,6 +507,7 @@ window.addEventListener('scroll', () => {
         }
 
         function render() {
+            const shift = shiftCur;
             for (let i = 0; i < n; i++) {
                 const d = wrapDist(i - pos);
                 const ad = Math.abs(d);
@@ -462,10 +516,11 @@ window.addEventListener('scroll', () => {
                 const z = -Math.min(ad, MAXD) * 170;             // push back
                 const o = ad >= MAXD + 0.5 ? 0 : 1 - (ad / (MAXD + 0.6)) * 0.75;
                 const bl = ad <= 0.5 ? 0 : Math.min((ad - 0.5) * 2.2, 4);
-                c.style.transform = 'translate3d(' + (d * gap()) + 'px,' + (ad * 14) + 'px,' + z + 'px) rotateY(' + rz + 'deg)';
+                const xShift = (d === 0 && shift) ? shift : (d !== 0 ? shift * Math.max(0, 1 - ad / 2) : 0);
+                c.style.transform = 'translate3d(' + (d * gap() + xShift) + 'px,' + (ad * 14) + 'px,' + z + 'px) rotateY(' + rz + 'deg)';
                 c.style.opacity = o.toFixed(3);
                 c.style.filter = bl ? 'blur(' + bl.toFixed(2) + 'px)' : 'none';
-                c.style.zIndex = String(100 - Math.round(ad * 10));
+                c.style.zIndex = (drawerCard === c) ? '300' : String(100 - Math.round(ad * 10));
                 const active = ad <= 0.5;
                 c.classList.toggle('is-active', active);
                 // visible cards must accept clicks (click-to-center) and drags;
@@ -486,10 +541,23 @@ window.addEventListener('scroll', () => {
 
         function loop() {
             raf = null;
-            pos += (target - pos) * 0.14;
-            if (Math.abs(target - pos) < 0.0005) pos = target;
+            let animating = false;
+            const dPos = target - pos;
+            if (Math.abs(dPos) >= 0.0005) {
+                pos += dPos * 0.14;
+                animating = true;
+            } else {
+                pos = target;
+            }
+            const dShift = shiftTarget - shiftCur;
+            if (Math.abs(dShift) >= 0.5) {
+                shiftCur += dShift * 0.16;
+                animating = true;
+            } else {
+                shiftCur = shiftTarget;
+            }
             render();
-            if (pos !== target) raf = requestAnimationFrame(loop);
+            if (animating) raf = requestAnimationFrame(loop);
         }
 
         function queue() { if (!raf) raf = requestAnimationFrame(loop); }
@@ -509,6 +577,63 @@ window.addEventListener('scroll', () => {
             target = Math.round(target) + wrapDist(i - Math.round(target));
             sync(true);
         }
+
+        /* ---------- slide-out drawer (sub-menu) ---------- */
+        function closeDrawer() {
+            if (!drawerCard) return;
+            const c = drawerCard;
+            drawerCard = null;
+            shiftTarget = 0;
+            c.classList.remove('card-drawer-open');
+            const btn = c.querySelector('[data-drawer-open]');
+            const panel = c.querySelector('.car-drawer');
+            if (btn) btn.setAttribute('aria-expanded', 'false');
+            if (panel) panel.setAttribute('aria-hidden', 'true');
+            if (backdrop) backdrop.classList.remove('on');
+            queue();
+        }
+
+        function openDrawer(card) {
+            if (drawerCard === card) return;
+            closeDrawer();
+            drawerCard = card;
+            const wide = window.innerWidth > 900;
+            shiftTarget = wide ? -DRAWER_SHIFT : 0;
+            card.classList.add('card-drawer-open');
+            const btn = card.querySelector('[data-drawer-open]');
+            const panel = card.querySelector('.car-drawer');
+            if (btn) btn.setAttribute('aria-expanded', 'true');
+            if (panel) panel.setAttribute('aria-hidden', 'false');
+            if (!wide && !backdrop) {
+                backdrop = document.createElement('div');
+                backdrop.className = 'car-drawer-backdrop';
+                backdrop.addEventListener('click', closeDrawer);
+                viewport.appendChild(backdrop);
+            }
+            if (backdrop && !wide) backdrop.classList.add('on');
+            queue();
+        }
+
+        cards.forEach((card) => {
+            const openBtn = card.querySelector('[data-drawer-open]');
+            if (!openBtn) return;
+            const panel = card.querySelector('.car-drawer');
+            if (panel) {
+                const list = panel.querySelector('[data-drawer-list]');
+                const key = panel.id;
+                if (list && DRAWER_DATA[key]) renderDrawerItems(list, DRAWER_DATA[key]);
+            }
+            openBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (drawerCard === card) closeDrawer(); else openDrawer(card);
+            });
+            const closeBtn = card.querySelector('[data-drawer-close]');
+            if (closeBtn) closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeDrawer(); });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && drawerCard) closeDrawer();
+        });
 
         /* ---------- pointer drag with momentum ----------
            No setPointerCapture: it would retarget the post-release click to the
@@ -550,6 +675,7 @@ window.addEventListener('scroll', () => {
 
         viewport.addEventListener('pointerdown', (e) => {
             if (reduceMotion) return;                 // native scroll instead
+            if (drawerCard && !drawerCard.contains(e.target)) return;  // drawer open: drags off-card disabled
             if (e.pointerType === 'mouse' && e.button !== 0) return;
             dragging = true; moved = 0; lastX = e.clientX; vel = 0; lastT = e.timeStamp;
             startTarget = Math.round(target);
@@ -565,6 +691,11 @@ window.addEventListener('scroll', () => {
         // hit-testing; map the click x back to a card index instead.
         viewport.addEventListener('click', (e) => {
             if (moved > 6) { e.preventDefault(); e.stopPropagation(); return; }
+            if (drawerCard) {
+                // clicks inside the open drawer's card are its own; elsewhere: close
+                if (!drawerCard.contains(e.target)) { closeDrawer(); }
+                return;
+            }
             const vr = viewport.getBoundingClientRect();
             const d = Math.round((e.clientX - (vr.left + vr.width / 2)) / gap());
             if (d !== 0 && Math.abs(d) <= MAXD) {
@@ -582,12 +713,20 @@ window.addEventListener('scroll', () => {
             if (e.altKey || e.ctrlKey || e.metaKey) return;
             const t = e.target;
             if (t && t instanceof Element && (t.matches('input, textarea, select') || t.isContentEditable)) return;
+            if (drawerCard) return;                   // drawer open: keyboard stays in the panel
             if (!inView()) return;
             if (e.key === 'ArrowLeft') { go(Math.round(target) - 1); e.preventDefault(); }
             if (e.key === 'ArrowRight') { go(Math.round(target) + 1); e.preventDefault(); }
         });
 
-        window.addEventListener('resize', () => { render(); });
+        window.addEventListener('resize', () => {
+            if (drawerCard) {
+                const wide = window.innerWidth > 900;
+                shiftTarget = wide ? -DRAWER_SHIFT : 0;
+                if (backdrop) backdrop.classList.toggle('on', !wide);
+            }
+            render();
+        });
         render();
     }
 
