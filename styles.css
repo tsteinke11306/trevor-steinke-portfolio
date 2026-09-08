@@ -42,10 +42,11 @@
     /* Effects */
     --transition: all 0.3s ease;
     --glass-blur: blur(16px);
+    --vignette: rgba(0, 0, 0, 0.75);
     --glow-color: rgba(255, 255, 255, 0.04);
-    --orb-1: rgba(255, 255, 255, 0.05);
-    --orb-2: rgba(255, 255, 255, 0.035);
-    --orb-3: rgba(255, 255, 255, 0.025);
+    --orb-1: rgba(255, 255, 255, 0.13);
+    --orb-2: rgba(255, 255, 255, 0.05);
+    --orb-3: rgba(255, 255, 255, 0.05);
 
     /* Fonts - orderful.com inspired */
     --font-display: 'Space Mono', 'Courier New', monospace;
@@ -81,9 +82,10 @@
     --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
 
     --glow-color: rgba(0, 0, 0, 0.02);
-    --orb-1: rgba(0, 0, 0, 0.035);
-    --orb-2: rgba(0, 0, 0, 0.025);
-    --orb-3: rgba(0, 0, 0, 0.015);
+    --vignette: rgba(0, 0, 0, 0.16);
+    --orb-1: rgba(0, 0, 0, 0.09);
+    --orb-2: rgba(0, 0, 0, 0.03);
+    --orb-3: rgba(0, 0, 0, 0.03);
 
     --btn-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     --btn-shadow-hover: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -127,9 +129,20 @@ body::before {
     pointer-events: none;
     z-index: -1;
     background-image:
-        radial-gradient(circle 600px at 15% 20%, var(--orb-1), transparent),
-        radial-gradient(circle 500px at 85% 60%, var(--orb-2), transparent),
-        radial-gradient(circle 400px at 50% 90%, var(--orb-3), transparent);
+        radial-gradient(circle 520px at 32% 8%, var(--orb-1), transparent),
+        radial-gradient(circle 900px at 72% 105%, var(--orb-2), transparent),
+        radial-gradient(circle 620px at 8% 78%, var(--orb-3), transparent);
+}
+
+/* Vignette: darkens page edges so the top light source reads as directional
+   light through glass. z-index -1 keeps it behind all content and cards. */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(ellipse 120% 100% at 50% 0%, transparent 55%, var(--vignette) 100%);
 }
 
 .container {
