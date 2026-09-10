@@ -897,7 +897,9 @@ body::after {
     -webkit-user-select: none;
 }
 
-/* carousel-scoped density: fit full descriptions without scrolling */
+/* carousel-scoped density: fit full descriptions without scrolling.
+   0.9375rem description (half-step up from 0.875) fills more of the fixed
+   620px card on short-description cards without overflowing the longest. */
 .carousel-track .project-card {
     padding: 20px 22px;
 }
