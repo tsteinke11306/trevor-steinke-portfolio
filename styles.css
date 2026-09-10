@@ -906,8 +906,11 @@ body::after {
     font-size: 1.05rem;
 }
 
+/* carousel-scoped density: fit full descriptions without scrolling.
+   0.9375rem (half-step up from 0.875) fills more of the fixed 620px card
+   on short-description cards without overflowing the longest ones. */
 .carousel-track .project-card .project-description {
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     line-height: 1.5;
     flex: 1 1 auto;
     min-height: 0;
