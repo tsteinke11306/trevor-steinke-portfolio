@@ -429,7 +429,7 @@ window.addEventListener('scroll', () => {
                     body: [
                         'The chat_session_id parameter in PDF Spaces assistant endpoints was not validated against the authenticated user. Replaying a chat_session_id issued to account B while authenticated as account A returned account B\'s assistant session, including its persisted memory and context.',
                         'Confirmed with a two-account test: per-session memory was verified with a canary value, then fully readable after the cross-account swap. Reported with reproduction steps and scored CVSS 7.1 (High).',
-                        'Submitted to Intigriti on Sep 3, 2026. Triage expected Sep 9-10.'
+                        'Submitted to Intigriti on Sep 3, 2026. Triage window (Sep 9-10) has passed with no response; status watch continues. As of Sep 12 the report remains untriaged.'
                     ]
                 },
                 {
