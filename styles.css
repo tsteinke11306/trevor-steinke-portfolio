@@ -864,6 +864,12 @@ body::after {
     position: relative;
     perspective: 1400px;
     height: 700px;
+    /* Bleed past the container gutters so the d=±1 neighbor cards aren't
+       clipped mid-card (rail is ~880px wide, content column 1152px).
+       36px/side clears the ~17-27px clip on both carousels without pulling
+       the d=±2 ghost cards into view. Symmetric, so the perspective origin
+       (and thus all card projection math) is unchanged. */
+    margin: 0 -36px;
     overflow: hidden;
     cursor: grab;
     touch-action: pan-y;
