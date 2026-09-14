@@ -9,8 +9,8 @@
    BLACK & WHITE GLASSMORPHISM THEME
    Default = dark B&W (striking, terminal-like)
    Light = inverted B&W via [data-theme="light"]
-   Fonts: Space Grotesk (body) + Space Mono (display)
-   Inspired by orderful.com typography
+   Fonts: Geist (headings/body) + Geist Mono (labels/accents)
+   Inspired by strix.ai typography
    ============================================ */
 
 :root {
@@ -49,9 +49,10 @@
     --orb-2: rgba(255, 255, 255, 0.05);
     --orb-3: rgba(255, 255, 255, 0.05);
 
-    /* Fonts - orderful.com inspired */
-    --font-display: 'Space Mono', 'Courier New', monospace;
-    --font-body: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    /* Fonts - strix.ai inspired */
+    --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-display: 'Geist Mono', 'Courier New', monospace;
+    --font-body: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
     /* Button shadow */
     --btn-shadow: 0 4px 16px rgba(255, 255, 255, 0.08);
@@ -328,7 +329,7 @@ body::after {
     margin-bottom: 16px;
     color: var(--text-color);
     letter-spacing: -0.03em;
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     line-height: 1.1;
 }
 
@@ -337,7 +338,7 @@ body::after {
     color: var(--text-light);
     margin-bottom: 12px;
     font-weight: 400;
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     letter-spacing: 0.02em;
     min-height: 1.6em;
 }
@@ -529,7 +530,7 @@ body::after {
     margin-bottom: 48px;
     color: var(--text-color);
     letter-spacing: -0.03em;
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     line-height: 1.15;
 }
 
@@ -600,7 +601,7 @@ body::after {
     color: var(--text-color);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
 }
 
 .skill-list {
@@ -761,7 +762,7 @@ body::after {
     font-weight: 700;
     margin-bottom: 8px;
     color: var(--text-color);
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     letter-spacing: 0.02em;
 }
 
@@ -1656,7 +1657,7 @@ body::after {
     font-size: 1.25rem;
     margin-bottom: 16px;
     color: var(--text-color);
-    font-family: var(--font-display);
+    font-family: var(--font-sans);
     letter-spacing: 0.02em;
 }
 
@@ -1779,7 +1780,7 @@ body::after {
     margin-bottom: 16px;
     color: var(--text-light);
     font-size: 0.8125rem;
-    font-family: var(--font-display);
+    font-family: var(--font-body);
     letter-spacing: 0.03em;
 }
 
