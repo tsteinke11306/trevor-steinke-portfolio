@@ -415,6 +415,24 @@ window.addEventListener('scroll', () => {
     const GAP_DESKTOP = 440;
     const DRAWER_SHIFT = 190;   // px the rail slides left when a drawer is open
 
+    /* Ghost cards (|d|>1) get a traveling inner-edge dissolve so the sliver
+       they show past the viewport edge melts out over ~90px instead of
+       ending at the 16px overflow veil. The ramp WIDTH is blended in
+       between the neighbor slot (ad=1, none) and the ghost slot (ad=1.5,
+       full 90px) so it never pops during drags; quantized to 0.05 steps
+       so the per-frame mask repaint stays cheap. Cleared again past the
+       opacity horizon where the card is invisible anyway. */
+    const GHOST_RAMP = 90;
+    function ghostMask(d, ad) {
+        if (ad <= 1.05 || ad >= 3.2) return 'none';
+        const m = Math.round(Math.min(1, (ad - 1.05) / 0.45) * 20) / 20;
+        if (m <= 0) return 'none';
+        const r = Math.round(m * GHOST_RAMP) + 'px';
+        return d > 0
+            ? 'linear-gradient(to right, transparent 0, #000 ' + r + ')'
+            : 'linear-gradient(to right, #000 0, #000 calc(100% - ' + r + '), transparent)';
+    }
+
     /* ---------- drawer data (add new findings here) ----------
        item: { title, sev, meta, link, body: [paragraphs] }
        sev: Critical | High | Medium | Low | Info (chip tint follows) */
@@ -555,6 +573,10 @@ window.addEventListener('scroll', () => {
 
         function render() {
             const shift = shiftCur;
+            // swiping away from the drawer's card closes it; otherwise the panel
+            // rides a side ghost while drags starting off that card are ignored,
+            // which dead-ends the rail until Escape
+            if (drawerCard && Math.abs(wrapDist(cards.indexOf(drawerCard) - pos)) > 0.08) closeDrawer();
             for (let i = 0; i < n; i++) {
                 const d = wrapDist(i - pos);
                 const ad = Math.abs(d);
@@ -567,6 +589,8 @@ window.addEventListener('scroll', () => {
                 c.style.transform = 'translate3d(' + (d * gap() + xShift) + 'px,' + (ad * 14) + 'px,' + z + 'px) rotateY(' + rz + 'deg)';
                 c.style.opacity = o.toFixed(3);
                 c.style.filter = bl ? 'blur(' + bl.toFixed(2) + 'px)' : 'none';
+                c.style.maskImage = ghostMask(d, ad);
+                c.style.webkitMaskImage = ghostMask(d, ad);
                 c.style.zIndex = (drawerCard === c) ? '300' : String(100 - Math.round(ad * 10));
                 const active = ad <= 0.5;
                 c.classList.toggle('is-active', active);
