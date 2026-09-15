@@ -871,6 +871,13 @@ body::after {
        (and thus all card projection math) is unchanged. */
     margin: 0 -36px;
     overflow: hidden;
+    /* Soft-veil the outer ~16px so the d=±2 ghost cards dissolve into the
+       page bg at the viewport edge instead of ending in a hard overflow
+       cut. The ramp completes inside the d=±1 neighbors' outer edges
+       (~18-19px in on desktop, ~39px on mobile), so neighbors stay
+       full-strength; during a drag, cards fade out as they cross the veil. */
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 16px, #000 calc(100% - 16px), transparent);
+    mask-image: linear-gradient(to right, transparent, #000 16px, #000 calc(100% - 16px), transparent);
     cursor: grab;
     touch-action: pan-y;
     -webkit-tap-highlight-color: transparent;
