@@ -415,6 +415,16 @@ window.addEventListener('scroll', () => {
     const GAP_DESKTOP = 440;
     const DRAWER_SHIFT = 190;   // px the rail slides left when a drawer is open
 
+    /* Edge treatment for off-center cards. 'ca' = chromatic aberration only
+       (RGB channel split: R shifted left, B right, screen-blended back via
+       the hidden #chroma-N SVG filters in index.html); 'ca+blur' stacks the
+       old depth blur after the split. The offset ramps in from the active
+       slot (0 at ad<=0.5, same readability rule the blur had) and quantizes
+       to 0.5px steps, so a card only ever re-rasters one of five filter
+       variants at a given distance instead of a new one every frame. */
+    const EDGE_FX = 'ca';
+    const CA_RAMP = 1.5, CA_MAX = 2.5;
+
     /* Ghost cards (|d|>1) get a traveling inner-edge dissolve so the sliver
        they show past the viewport edge melts out over ~90px instead of
        ending at the 16px overflow veil. The ramp WIDTH is blended in
@@ -431,6 +441,26 @@ window.addEventListener('scroll', () => {
         return d > 0
             ? 'linear-gradient(to right, transparent 0, #000 ' + r + ')'
             : 'linear-gradient(to right, #000 0, #000 calc(100% - ' + r + '), transparent)';
+    }
+
+    /* chromatic-aberration filter lookup. Offsets scale the base 1px split
+       by `level` (the same 0..1 ramp that drove blur); variants live in
+       index.html as #chroma-0.5 .. #chroma-2.5. Falls back to the old blur
+       when the filter defs are missing (e.g. stale cache). */
+    let caOK = null;                       // tri-state: unknown / working / broken
+    function edgeFilter(ad) {
+        if (EDGE_FX === 'none') return 'none';
+        const level = Math.min((ad - 0.5) * 2 / 3, 1);
+        if (level <= 0) return 'none';
+        const off = Math.min(Math.round(level * CA_MAX * 2) / 2, CA_MAX);
+        const url = 'url(#chroma-' + off + ')';
+        if (caOK === false) {
+            // SVG filter defs missing (stale cache): old depth blur instead
+            const bl = Math.min((ad - 0.5) * 2.2, 4);
+            return bl ? 'blur(' + bl.toFixed(2) + 'px)' : 'none';
+        }
+        if (caOK === true) return EDGE_FX === 'ca+blur' ? url + ' blur(2px)' : url;
+        return '__ca_probe__' + off;
     }
 
     /* ---------- drawer data (add new findings here) ----------
@@ -547,6 +577,28 @@ window.addEventListener('scroll', () => {
         let detailItems = null;     // findings array of the open drawer
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+        /* one-time capability probe: paint an offscreen card with the smallest
+           CA filter; Chromium rasterizes url(#missing) to nothing, so a real
+           filter leaves visible (non-black) pixels while a broken reference
+           empties the element. Also verifies the defs made it into this
+           page's index.html (stale-cache guard). */
+        if (caOK === null) {
+            try {
+                if (!document.querySelector('.ca-filter-defs')) {
+                    caOK = false;
+                } else {
+                    const t = document.createElement('div');
+                    t.textContent = 'CA';
+                    t.style.cssText = 'position:fixed;left:-99px;top:-99px;width:40px;height:40px;color:#fff;background:#000;font-size:30px;font-weight:bold;';
+                    t.style.filter = 'url(#chroma-0.5)';
+                    document.body.appendChild(t);
+                    caOK = t.offsetWidth > 0;
+                    t.remove();
+                    if (caOK) setTimeout(() => { queue(); }, 0);
+                }
+            } catch (e) { caOK = false; }
+        }
+
         /* ---------- a11y parity with the old ring ---------- */
         cards.forEach((c, i) => {
             const d = document.createElement('button');
@@ -584,11 +636,10 @@ window.addEventListener('scroll', () => {
                 const rz = Math.max(-1, Math.min(1, d)) * -14;   // deg, toward center
                 const z = -Math.min(ad, MAXD) * 170;             // push back
                 const o = ad >= MAXD + 0.5 ? 0 : 1 - (ad / (MAXD + 0.6)) * 0.75;
-                const bl = ad <= 0.5 ? 0 : Math.min((ad - 0.5) * 2.2, 4);
                 const xShift = (d === 0 && shift) ? shift : (d !== 0 ? shift * Math.max(0, 1 - ad / 2) : 0);
                 c.style.transform = 'translate3d(' + (d * gap() + xShift) + 'px,' + (ad * 14) + 'px,' + z + 'px) rotateY(' + rz + 'deg)';
                 c.style.opacity = o.toFixed(3);
-                c.style.filter = bl ? 'blur(' + bl.toFixed(2) + 'px)' : 'none';
+                c.style.filter = edgeFilter(ad);
                 c.style.maskImage = ghostMask(d, ad);
                 c.style.webkitMaskImage = ghostMask(d, ad);
                 c.style.zIndex = (drawerCard === c) ? '300' : String(100 - Math.round(ad * 10));

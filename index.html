@@ -807,6 +807,61 @@
         </div>
     </footer>
 
+    <!-- Chromatic aberration filter ramp for the carousel edge cards:
+         R channel shifted -N px, B shifted +N px, screen-blended back
+         (screen = linear-add on monochrome content, keeps midtones).
+         Offsets ramp in from the active slot; script.js picks the variant
+         from card distance and quantizes to 0.5px steps. -->
+    <svg class="ca-filter-defs" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+        <defs>
+            <filter id="chroma-0.5" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+                <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="R"/>
+                <feOffset in="R" dx="-0.5" dy="0" result="Ro"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="G"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="B"/>
+                <feOffset in="B" dx="0.5" dy="0" result="Bo"/>
+                <feBlend in="Ro" in2="G" mode="screen" result="RG"/>
+                <feBlend in="RG" in2="Bo" mode="screen"/>
+            </filter>
+            <filter id="chroma-1" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+                <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="R"/>
+                <feOffset in="R" dx="-1" dy="0" result="Ro"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="G"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="B"/>
+                <feOffset in="B" dx="1" dy="0" result="Bo"/>
+                <feBlend in="Ro" in2="G" mode="screen" result="RG"/>
+                <feBlend in="RG" in2="Bo" mode="screen"/>
+            </filter>
+            <filter id="chroma-1.5" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+                <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="R"/>
+                <feOffset in="R" dx="-1.5" dy="0" result="Ro"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="G"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="B"/>
+                <feOffset in="B" dx="1.5" dy="0" result="Bo"/>
+                <feBlend in="Ro" in2="G" mode="screen" result="RG"/>
+                <feBlend in="RG" in2="Bo" mode="screen"/>
+            </filter>
+            <filter id="chroma-2" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+                <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="R"/>
+                <feOffset in="R" dx="-2" dy="0" result="Ro"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="G"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="B"/>
+                <feOffset in="B" dx="2" dy="0" result="Bo"/>
+                <feBlend in="Ro" in2="G" mode="screen" result="RG"/>
+                <feBlend in="RG" in2="Bo" mode="screen"/>
+            </filter>
+            <filter id="chroma-2.5" x="-5%" y="-5%" width="110%" height="110%" color-interpolation-filters="sRGB">
+                <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="R"/>
+                <feOffset in="R" dx="-2.5" dy="0" result="Ro"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="G"/>
+                <feColorMatrix in="SourceGraphic" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="B"/>
+                <feOffset in="B" dx="2.5" dy="0" result="Bo"/>
+                <feBlend in="Ro" in2="G" mode="screen" result="RG"/>
+                <feBlend in="RG" in2="Bo" mode="screen"/>
+            </filter>
+        </defs>
+    </svg>
+
     <script src="script.js"></script>
 </body>
 </html>
