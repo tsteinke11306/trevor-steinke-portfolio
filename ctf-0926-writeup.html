@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTF Write-up: Intigriti 0926 "Critter Gallery" — SQL Injection</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-code: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #e6edf3;
+    --critical: #f85149;
+    --high: #db6d28;
+    --medium: #d29922;
+    --info: #388bfd;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Geist', -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 40px 24px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  .back { color: var(--text-dim); text-decoration: none; font-size: 0.85rem; display: inline-block; margin-bottom: 28px; }
+  .back:hover { color: var(--text); }
+  h1 { font-size: 1.7rem; line-height: 1.25; margin-bottom: 10px; font-weight: 700; }
+  .subtitle { color: var(--text-dim); font-size: 0.88rem; margin-bottom: 32px; }
+  .subtitle code { color: var(--text); }
+  h2 { font-size: 1.2rem; margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-weight: 600; }
+  h3 { font-size: 1.0rem; margin: 22px 0 8px; font-weight: 600; }
+  p { margin-bottom: 12px; }
+  ul { margin: 0 0 12px 22px; }
+  li { margin-bottom: 6px; }
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    font-family: 'Geist Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    margin: 12px 0 16px;
+  }
+  code {
+    font-family: 'Geist Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 0.85em;
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+  pre code { background: none; border: none; padding: 0; font-size: 1em; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0 16px; font-size: 0.85rem; }
+  th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; }
+  th { background: var(--bg-card); font-family: 'Geist Mono', monospace; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); }
+  .callout {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--high);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 0.9rem;
+  }
+  .footer { color: var(--text-dim); font-size: 0.82rem; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .lesson { margin: 20px 0; }
+  .lesson strong { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a class="back" href="https://trevorsteinke.com">&larr; Back to trevorsteinke.com</a>
+
+<h1>Critter Gallery: UNION SQLi behind a base64 parameter</h1>
+<div class="subtitle">Intigriti monthly CTF 0926 &middot; September 2026 &middot; solved in ~6h &middot; write-up published after the challenge closed &middot; PoC: <code>ctf-0926-sqli-poc.py</code></div>
+
+<h2>TL;DR</h2>
+<p>The challenge hid a classic UNION-based SQL injection behind a base64-encoded parameter. The app decoded <code>pic</code> and interpolated it straight into a MySQL <code>WHERE name = '&lt;INPUT&gt;'</code> clause. No WAF on quotes, no parameterization, one column, MySQL 8.0.46. Flag extracted with a single UNION query against a <code>secret_vault</code> table found via <code>information_schema</code>.</p>
+<p><strong>Winning payload</strong> (<code>pic</code> = base64 of the string below):</p>
+<pre>x' UNION SELECT group_concat(note) FROM secret_vault-- </pre>
+<p>The trailing space after <code>--</code> matters. More on that below.</p>
+
+<h2>The target</h2>
+<p>"Critter Gallery" &mdash; an animal gallery on PHP 8.2. The landing page offers eight critters; each detail link looks like <code>?pic=Zm94</code> (base64 for <code>fox</code>). Unknown values echo their base64-<em>decoded</em> bytes (HTML-escaped) into the page's <code>&lt;h2&gt;</code> &mdash; so the server decodes the parameter before using it, and the app is one parameter, one lookup. When the attack surface is this small, the parameter <em>is</em> the app.</p>
+
+<h2>Step 1: an error oracle out of nothing</h2>
+<p>Firing decoded-garbage inputs at the parameter produced something odd immediately: some inputs returned a <strong>completely empty 200 response</strong>. Not a 500 &mdash; HTTP 200, zero bytes, fast (6ms vs ~20ms for normal responses). Mapping which inputs lived and died:</p>
+<table>
+<tr><th>Input (decoded)</th><th>Result</th></tr>
+<tr><td><code>zzz</code></td><td>normal page, "no critter"</td></tr>
+<tr><td><code>abc"d</code> (double quote)</td><td>normal page</td></tr>
+<tr><td><code>abc'd</code> (single quote)</td><td><strong>0-byte death</strong></td></tr>
+<tr><td><code>''</code> (two quotes)</td><td>normal page</td></tr>
+<tr><td><code>'a'</code> (balanced pair)</td><td><strong>0-byte death</strong></td></tr>
+<tr><td><code>1'||'2</code></td><td>normal page &mdash; <strong>but all 8 critter descriptions</strong></td></tr>
+</table>
+<p>That last row is where the real work started. First, three wrong theories.</p>
+
+<h2>Step 2: three wrong theories</h2>
+<p><strong>Theory 1: SQLite.</strong> The quote behavior &mdash; <code>''</code> surviving as an escaped quote, isolated quotes dying &mdash; smells exactly like SQLite's escaping. Burned several probes on this before checking.</p>
+<p><strong>Theory 2: a quote filter with odd/even pairing.</strong> <code>''''</code> survived, <code>'''</code> died, <code>'a'</code> died but <code>a''b</code> survived. No pairing rule fit the data &mdash; because the rule wasn't about quotes at all.</p>
+<p><strong>Theory 3: output-encoding bugs.</strong> All output was properly <code>htmlspecialchars</code>'d. The bug was never going to be in the rendering.</p>
+<p>The mistake in all three: treating the <em>death</em> cases as the signal. The live cases were the signal.</p>
+
+<h2>Step 3: <code>1'||'2</code> leaks the whole table</h2>
+<p>That row broke the theories: <code>1'||'2</code> rendered a normal page, but the description block contained <strong>all eight critter descriptions concatenated</strong>. That's not an echo &mdash; that's a query returning every row.</p>
+<p>Under "the app wraps input in <code>WHERE name = '&lt;INPUT&gt;'</code>":</p>
+<pre>WHERE name = '1'||'2'</pre>
+<p>That parses as <code>name = '1' OR '2'</code>. In <strong>MySQL</strong>, <code>||</code> is logical OR with numeric casting &mdash; and <code>'2'</code> casts to a truthy constant. The WHERE clause is always true, and every row comes back.</p>
+<p>One observation, three answers:</p>
+<ul>
+<li>It's SQL injection (query results flow into the response)</li>
+<li>The engine treats <code>||</code> as boolean-OR on numerics &rarr; <strong>MySQL</strong>, not SQLite (SQLite's <code>||</code> is string concatenation)</li>
+<li>My input has to leave the full statement &mdash; including the template's wrapping quotes &mdash; parseable</li>
+</ul>
+<p>The earlier "mystery" quote rule dissolved: <em>every 0-byte death was just a MySQL parse error on unbalanced quotes</em>. <code>'''</code> dies because three quotes don't balance inside the template. <code>'a'</code> dies because it produces <code>''a''</code> &mdash; balanced to a human counting characters, but the lexer sees an escaped-quote opening a string that then terminates badly.</p>
+<div class="callout"><strong>The 0-byte 200 is the error oracle.</strong> With <code>display_errors</code> off, a MySQL parse error and a normal page differ only in byte count and timing. Once I treated silence as "syntax error", everything after was fast.</div>
+
+<h2>Step 4: fingerprinting &mdash; and the <code>--</code> trap</h2>
+<p><code>x' UNION SELECT 'a</code> rendered its value in the description block: UNION confirmed. Column count came from <code>ORDER BY</code>: <code>x' ORDER BY 1-- </code> lived, <code>ORDER BY 2-- </code> died. One column.</p>
+<p>Then the gotcha that ate twenty minutes: <strong><code>--</code> without a trailing space does nothing in MySQL.</strong> Every payload ending in a bare <code>--</code> died with the 0-byte response. I briefly concluded comments were WAF-blocked. The real story: MySQL's <code>--</code> must be followed by whitespace to count as a comment &mdash; otherwise it lexes as two minus signs, the template's trailing quote goes unbalanced, and the statement dies.</p>
+<pre>x' UNION SELECT version()--     &#8594; 8.0.46</pre>
+<p>(Side quest that confirmed it independently: <code>'abc'||'x'</code> rendered <code>0</code> &mdash; MySQL casting both strings to 0 for the OR.)</p>
+
+<h2>Step 5: information_schema &rarr; flag</h2>
+<pre>x' UNION SELECT group_concat(table_name) FROM information_schema.tables--
+  &#8594; animals, secret_vault
+
+x' UNION SELECT group_concat(column_name) FROM information_schema.columns
+  WHERE table_name='secret_vault'--
+  &#8594; id, note
+
+x' UNION SELECT group_concat(note) FROM secret_vault--
+  &#8594; INTIGRITI{...}</pre>
+<p>One quirk worth knowing: <code>x' UNION SELECT 123</code> &mdash; perfectly valid, right arity &mdash; died, and so did every numeric/function-call SELECT I tried. The renderer stringifies rows in a way that fatals on non-string values. Practical consequence: extract with <code>group_concat</code> (returns strings) or wrap values in <code>CAST(x AS CHAR)</code>.</p>
+
+<h2>What I'd tell past-me</h2>
+<div class="lesson"><p><strong>1. A 0-byte 200 is data, not a failure.</strong> Silent parse errors are an oracle. Treat response-shape differences as signal even when the status code doesn't change.</p></div>
+<div class="lesson"><p><strong>2. Fingerprint the engine before theorizing.</strong> One <code>version()</code> with a properly-spaced comment saves the entire wrong-engine detour. Test <code>||</code> semantics early &mdash; OR-of-strings vs concat is a two-second MySQL/SQLite discriminator.</p></div>
+<div class="lesson"><p><strong>3. MySQL comments need the space.</strong> <code>-- </code> not <code>--</code>. This single lexing detail masqueraded as WAF behavior.</p></div>
+<div class="lesson"><p><strong>4. Base64-wrapped parameters are not sanitized parameters.</strong> Decode-then-interpolate is still interpolate.</p></div>
+<div class="lesson"><p><strong>5. Balance the template's quotes, not just your own.</strong> Every payload has to leave the <em>entire</em> statement parseable, including the quote the app appends after your input.</p></div>
+
+<div class="footer">
+Solved during the live challenge window (Sept 21&ndash;28, 2026), published after close per challenge rules. Sanctioned CTF &mdash; no real systems were affected. PoC artifacts: <code>ctf-0926-sqli-poc.py</code>.
+</div>
+
+</div>
+</body>
+</html>
