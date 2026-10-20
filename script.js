@@ -538,23 +538,14 @@ window.addEventListener('scroll', () => {
     DRAWER_DATA['ctf-findings'] = {
         items: [
             {
-                title: 'UNION SQL injection behind a base64-decoded parameter',
+                title: 'Monthly challenge solve pipeline',
                 sev: 'Info',
-                meta: 'Intigriti 0926 · solved Sept 2026',
+                meta: 'Intigriti monthly · 2026',
                 link: 'ctf-0926-writeup.html',
                 body: [
-                    'Monthly challenge solve (~6h): UNION-based SQL injection hidden behind a base64-decoded parameter (MySQL 8.0.46, single column). Built an error oracle from 0-byte HTTP 200 responses, fingerprinted the engine via || operator semantics, and extracted the flag from a hidden table through information_schema in one UNION query.',
-                    'Methodology, wrong-theory post-mortem, and a scripted probe chain in the PoC. Flag value withheld here by the two-copy publishing rule.'
-                ]
-            },
-            {
-                title: 'Array-based bypass of a coupon validation guard',
-                sev: 'Medium',
-                meta: 'Intigriti 1026 · awaiting closure Oct 26',
-                link: null,
-                body: [
-                    'The coupon redemption guard validated a scalar while the upstream deserializer accepted an array, letting the guard be bypassed across parallel redemption requests. Verified with a clean-room repro script; classified CWE-284.',
-                    'Submitted Oct 19, 2026 ahead of the challenge closure; write-up placement decided after results. Flag values and challenge specifics stay sanitized per the identity split.'
+                    'Each monthly Intigriti challenge gets the same pipeline: pin down the tech stack from the artifacts, map the input surface, build a scripted probe chain against it, and iterate on a hypothesis until the flag drops. Solve time and a wrong-theory post-mortem get logged so the misses stay part of the record.',
+                    'Sept 2026 worked example (~6h): UNION-based SQL injection hidden behind a base64-decoded parameter (MySQL 8.0.46, single column). Built an error oracle from 0-byte HTTP 200 responses, fingerprinted the engine via || operator semantics, and extracted the flag from a hidden table through information_schema in one UNION query. Full methodology in the linked write-up.',
+                    'Oct 2026: coupon redemption guard bypassed with an array-shaped payload (CWE-284 class), verified with a clean-room repro; result lands after the challenge closes Oct 26. Flag values stay withheld per the two-copy publishing rule and published PoCs ship sanitized.'
                 ]
             }
         ]
