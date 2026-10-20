@@ -540,12 +540,31 @@ window.addEventListener('scroll', () => {
             {
                 title: 'Monthly challenge solve pipeline',
                 sev: 'Info',
-                meta: 'Intigriti monthly · 2026',
+                meta: 'Intigriti monthly · 2026 · overview',
+                link: null,
+                body: [
+                    'Same pipeline every month: pin the tech stack from the challenge artifacts, map the input surface, build a scripted probe chain against it, and iterate on a hypothesis until the flag drops. Solve time and a wrong-theory post-mortem get logged so the misses stay part of the record.',
+                    'Two monthly challenges solved so far: Sept 0926 and Oct 1026, each detailed in its own entry below. Flag values stay out of public copy per the two-copy publishing rule; published PoCs ship sanitized.'
+                ]
+            },
+            {
+                title: '0926: UNION SQL injection behind a base64-decoded parameter',
+                sev: 'Info',
+                meta: 'Intigriti 0926 · solved Sept 2026 · write-up published',
                 link: 'ctf-0926-writeup.html',
                 body: [
-                    'Each monthly Intigriti challenge gets the same pipeline: pin down the tech stack from the artifacts, map the input surface, build a scripted probe chain against it, and iterate on a hypothesis until the flag drops. Solve time and a wrong-theory post-mortem get logged so the misses stay part of the record.',
-                    'Sept 2026 worked example (~6h): UNION-based SQL injection hidden behind a base64-decoded parameter (MySQL 8.0.46, single column). Built an error oracle from 0-byte HTTP 200 responses, fingerprinted the engine via || operator semantics, and extracted the flag from a hidden table through information_schema in one UNION query. Full methodology in the linked write-up.',
-                    'Oct 2026: coupon redemption guard bypassed with an array-shaped payload (CWE-284 class), verified with a clean-room repro; submission accepted. Flag values stay withheld per the two-copy publishing rule and published PoCs ship sanitized.'
+                    'MySQL 8.0.46 with a single output column. Built an error oracle from 0-byte HTTP 200 responses, fingerprinted the engine via || operator semantics, and extracted the flag from a hidden table through information_schema in one UNION query.',
+                    'Solve time ~6h. The linked write-up covers the methodology and the wrong-theory post-mortem; the PoC ships as a scripted probe chain with the flag redacted.'
+                ]
+            },
+            {
+                title: '1026: array bypass of a coupon validation guard',
+                sev: 'Medium',
+                meta: 'Intigriti 1026 · submission accepted',
+                link: null,
+                body: [
+                    'The coupon redemption guard validated a scalar while the upstream deserializer accepted an array, letting the guard be bypassed across parallel redemption requests. Classified CWE-284 and verified with a clean-room repro.',
+                    'Submission accepted. Flag values and challenge specifics stay sanitized for now; write-up page is queued behind this month\'s closure.'
                 ]
             }
         ]
