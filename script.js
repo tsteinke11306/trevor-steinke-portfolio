@@ -538,16 +538,6 @@ window.addEventListener('scroll', () => {
     DRAWER_DATA['ctf-findings'] = {
         items: [
             {
-                title: 'Monthly challenge solve pipeline',
-                sev: 'Info',
-                meta: 'Intigriti monthly · 2026 · overview',
-                link: null,
-                body: [
-                    'Same pipeline every month: pin the tech stack from the challenge artifacts, map the input surface, build a scripted probe chain against it, and iterate on a hypothesis until the flag drops. Solve time and a wrong-theory post-mortem get logged so the misses stay part of the record.',
-                    'Two monthly challenges solved so far: Sept 0926 and Oct 1026, each detailed in its own entry below. Flag values stay out of public copy per the two-copy publishing rule; published PoCs ship sanitized.'
-                ]
-            },
-            {
                 title: '0926: UNION SQL injection behind a base64-decoded parameter',
                 sev: 'Info',
                 meta: 'Intigriti 0926 · solved Sept 2026 · write-up published',
