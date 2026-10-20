@@ -470,6 +470,17 @@ window.addEventListener('scroll', () => {
         'recon-findings': {
             items: [
                 {
+                    title: 'Unauthenticated deep link opens arbitrary URLs in app-launched browser tabs',
+                    sev: 'Medium',
+                    meta: 'Intigriti · private program · CVSS 5.4 (7.1 logged-in)',
+                    link: null,
+                    body: [
+                        'An exported activity bound to a custom-scheme deep link passed an attacker-controlled url query parameter to a Chrome Custom Tab with no origin or scheme validation. The function\'s guard branches (session check, fragment check) all fall through to a return of the raw attacker URL, so the forced navigation fires even logged out.',
+                        'Logged-in half (bytecode-verified): with an active session the link fragment is templated with the account email and score before the same launch, delivering identity data to the chosen origin. Classified CWE-601.',
+                        'Device-proven on the unmodified Play-signed build (Android 14 emulator, verified sha256 + store-listed signing cert). Submitted to Intigriti on Oct 20, 2026. The program holds a one-open-submission rule; triage watch is armed.'
+                    ]
+                },
+                {
                     title: 'Cross-user session context disclosure in PDF Spaces',
                     sev: 'High',
                     meta: 'Adobe · Intigriti · CVSS 7.1',
@@ -477,7 +488,17 @@ window.addEventListener('scroll', () => {
                     body: [
                         'The chat_session_id parameter in PDF Spaces assistant endpoints was not validated against the authenticated user. Replaying a chat_session_id issued to account B while authenticated as account A returned account B\'s assistant session, including its persisted memory and context.',
                         'Confirmed with a two-account test: per-session memory was verified with a canary value, then fully readable after the cross-account swap. Reported with reproduction steps and scored CVSS 7.1 (High).',
-                        'Submitted to Intigriti on Sep 3, 2026. Triage window (Sep 9-10) has passed with no response; status watch continues. As of Sep 12 the report remains untriaged.'
+                        'Submitted Sep 3, 2026. The triage window passed unanswered and the report was later closed as a duplicate (no payout). Kept listed: the finding was real and the memory-binding methodology held up under the two-account test.'
+                    ]
+                },
+                {
+                    title: 'Report pending program review - enterprise disclosure program',
+                    sev: 'Info',
+                    meta: 'Intigriti · filed Sept 2026',
+                    link: null,
+                    body: [
+                        'Report accepted into review and passed preliminary analyst review; currently pending review by the program\'s internal team. No further researcher-side action permitted while in this state; watch cron checks status.',
+                        'Listed to track the engagement; details withheld until the program team finishes its internal review and disclosure is settled.'
                     ]
                 },
                 {
@@ -512,6 +533,31 @@ window.addEventListener('scroll', () => {
                 }
             ]
         }
+    };
+
+    DRAWER_DATA['ctf-findings'] = {
+        items: [
+            {
+                title: 'UNION SQL injection behind a base64-decoded parameter',
+                sev: 'Info',
+                meta: 'Intigriti 0926 · solved Sept 2026',
+                link: 'ctf-0926-writeup.html',
+                body: [
+                    'Monthly challenge solve (~6h): UNION-based SQL injection hidden behind a base64-decoded parameter (MySQL 8.0.46, single column). Built an error oracle from 0-byte HTTP 200 responses, fingerprinted the engine via || operator semantics, and extracted the flag from a hidden table through information_schema in one UNION query.',
+                    'Methodology, wrong-theory post-mortem, and a scripted probe chain in the PoC. Flag value withheld here by the two-copy publishing rule.'
+                ]
+            },
+            {
+                title: 'Array-based bypass of a coupon validation guard',
+                sev: 'Medium',
+                meta: 'Intigriti 1026 · awaiting closure Oct 26',
+                link: null,
+                body: [
+                    'The coupon redemption guard validated a scalar while the upstream deserializer accepted an array, letting the guard be bypassed across parallel redemption requests. Verified with a clean-room repro script; classified CWE-284.',
+                    'Submitted Oct 19, 2026 ahead of the challenge closure; write-up placement decided after results. Flag values and challenge specifics stay sanitized per the identity split.'
+                ]
+            }
+        ]
     };
 
     function renderDrawerItems(listEl, data, onOpen) {
