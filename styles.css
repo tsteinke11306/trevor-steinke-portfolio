@@ -33,6 +33,7 @@
     --glass-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.5);
     --menu-bg: rgba(10, 10, 10, 1);
     --pane-bg: rgba(16, 16, 16, 0.95);
+    --glass-bg-open: rgba(20, 20, 20, 0.95);
 
     /* Text */
     --text-color: #f5f5f5;
@@ -78,6 +79,7 @@
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     --glass-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.12);
     --pane-bg: rgba(233, 233, 233, 0.97);
+    --glass-bg-open: rgba(233, 233, 233, 0.97);
 
     --text-color: #0a0a0a;
     --text-light: #555555;
@@ -638,6 +640,13 @@ body::after {
     border-top-color: var(--glass-border-highlight);
     box-shadow: var(--glass-shadow), inset 0 1px 0 0 var(--glass-border-highlight);
     transition: var(--transition);
+}
+
+/* drawer/detail state slides the card over its left neighbor — go opaque so
+   the under-card content stops colliding with the shifted card's own text */
+.project-card.card-drawer-open,
+.project-card.card-detail-open {
+    background: var(--glass-bg-open);
 }
 
 .project-card:hover {
