@@ -367,40 +367,6 @@ window.addEventListener('scroll', () => {
     });
 });
 
-// Analytics tracking
-(function() {
-    const ANALYTICS_ENDPOINT = 'https://api.trevorsteinke.com:8443/api/analytics';
-    
-    // Track page view
-    function trackPageView() {
-        const data = {
-            path: window.location.pathname,
-            referrer: document.referrer || null
-        };
-        
-        // Use sendBeacon with Blob for proper Content-Type
-        if (navigator.sendBeacon) {
-            const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
-            navigator.sendBeacon(ANALYTICS_ENDPOINT, blob);
-        } else {
-            // Fallback to fetch
-            fetch(ANALYTICS_ENDPOINT, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-                keepalive: true
-            }).catch(() => {}); // Silently fail
-        }
-    }
-    
-    // Track on page load
-    if (document.readyState === 'complete') {
-        trackPageView();
-    } else {
-        window.addEventListener('load', trackPageView);
-    }
-})();
-
 /* ============================================
    Motion Rail carousels (drag + momentum, 3D lite)
    Replaces the rotateY ring: neighbors stay readable,

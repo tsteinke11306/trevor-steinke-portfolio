@@ -11,7 +11,6 @@ IT Technician portfolio showcasing skills, projects, and professional developmen
 - **Responsive design** - Works on all devices
 - **Dark mode** - System preference detection + manual toggle
 - **Contact form** - Emails submissions directly to inbox
-- **Analytics** - Self-hosted, privacy-friendly page tracking
 - **Social sharing** - Open Graph tags for nice link previews
 
 ## Tech Stack
@@ -22,7 +21,6 @@ IT Technician portfolio showcasing skills, projects, and professional developmen
 | Hosting | GitHub Pages |
 | DNS | Cloudflare |
 | Contact API | Node.js on VPS (port 8443) |
-| Analytics | SQLite + Node.js on VPS |
 
 ## Infrastructure
 
@@ -30,11 +28,7 @@ IT Technician portfolio showcasing skills, projects, and professional developmen
 trevorsteinke.com (GitHub Pages)
     ├── Static HTML/CSS/JS
     └── Contact form → api.trevorsteinke.com:8443
-                         ├── POST /api/contact (send email)
-                         ├── POST /api/analytics (track views)
-                         └── GET /api/analytics/stats (dashboard)
-
-Analytics Dashboard: trevorsteinke.com/analytics.html
+                         └── POST /api/contact (send email)
 ```
 
 ## Services
@@ -47,15 +41,10 @@ Analytics Dashboard: trevorsteinke.com/analytics.html
 
 Edit `index.html` directly. Changes auto-deploy via GitHub Pages.
 
-For server-side changes (contact/analytics), SSH into the VPS:
+For server-side changes (contact form backend), SSH into the VPS:
 ```bash
 systemctl restart portfolio-contact
 ```
-
-## Analytics Login
-
-- URL: https://trevorsteinke.com/analytics.html
-- Credentials stored in `/root/portfolio-contact/.env`
 
 ---
 
