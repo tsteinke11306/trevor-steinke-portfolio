@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTF Write-up: Intigriti 1026 "Halloween Store" &middot; Free Checkout via a Client-Supplied State Key</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&family=Geist:wght@100..900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --bg-card: #161b22;
+    --bg-code: #1c2128;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-dim: #8b949e;
+    --accent: #e6edf3;
+    --critical: #f85149;
+    --high: #db6d28;
+    --medium: #d29922;
+    --info: #388bfd;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Geist', -apple-system, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    padding: 40px 24px;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; }
+  .back { color: var(--text-dim); text-decoration: none; font-size: 0.85rem; display: inline-block; margin-bottom: 28px; }
+  .back:hover { color: var(--text); }
+  h1 { font-size: 1.7rem; line-height: 1.25; margin-bottom: 10px; font-weight: 700; }
+  .subtitle { color: var(--text-dim); font-size: 0.88rem; margin-bottom: 32px; }
+  .subtitle code { color: var(--text); }
+  h2 { font-size: 1.2rem; margin: 40px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-weight: 600; }
+  h3 { font-size: 1.0rem; margin: 22px 0 8px; font-weight: 600; }
+  p { margin-bottom: 12px; }
+  ul { margin: 0 0 12px 22px; }
+  li { margin-bottom: 6px; }
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    overflow-x: auto;
+    font-family: 'Geist Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    margin: 12px 0 16px;
+  }
+  code {
+    font-family: 'Geist Mono', 'JetBrains Mono', Consolas, monospace;
+    font-size: 0.85em;
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+  }
+  pre code { background: none; border: none; padding: 0; font-size: 1em; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0 16px; font-size: 0.85rem; }
+  th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; }
+  th { background: var(--bg-card); font-family: 'Geist Mono', monospace; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-dim); }
+  td code { white-space: nowrap; }
+  .callout {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--high);
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 0.9rem;
+  }
+  .footer { color: var(--text-dim); font-size: 0.82rem; margin-top: 48px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .lesson { margin: 20px 0; }
+  .lesson strong { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<a class="back" href="https://trevorsteinke.com">&larr; Back to trevorsteinke.com</a>
+
+<h1>Halloween Store: free checkout via a client-supplied state key</h1>
+<div class="subtitle">Intigriti monthly CTF 1026 &middot; October 2026 &middot; solved in ~4.5h &middot; write-up published after the challenge closed &middot; repro: <code>ctf-1026-repro.sh</code></div>
+
+<h2>TL;DR</h2>
+<p>The challenge was a small shop with one win condition: order The Midnight Collection, a &euro;666.00 product, from a session holding &euro;66.00 of store credit. Checkout is gated server-side, and a successful vault order's receipt carries the challenge token. The duplicate-coupon guard on <code>POST /api/cart/coupon</code> validated the request only as long as it looked exactly like the shipped client's requests. When I added one extra key the client never sends, the guard stopped rejecting an already-applied code, and each promo record's discount could be re-applied. Doubling the two discoverable codes (20% + 30%) stacked the discount to exactly 100% and the &euro;666.00 order checked out at &euro;0.00. The challenge token is withheld on this site by design.</p>
+
+<h2>The target</h2>
+<p>"Halloween Store": a session-scoped shop with no login and no accounts, so the session cookie is the whole game. Checkout is enforced server-side against the credit limit: the total must sit at or under the session credit, and the server answers <code>insufficient_credit</code> otherwise. No client-side check matters, because the server recomputes the total.</p>
+<p>Buying the vault means cutting the total by at least 90.09%. Two discount codes exist and both are findable by walking the UI:</p>
+<ul>
+<li><code>NIGHT20</code>: 20% off the vault, shown on the product banner.</li>
+<li><code>NEWS30</code>: 30%, handed out by POSTing a valid email to <code>/api/newsletter</code> (first-order code).</li>
+</ul>
+<p>Applied normally they stack additively: 20% + 30% = 50%, total &euro;333.00. Still five times over the credit. The gap between what the client can reach and what the server accepts is the puzzle.</p>
+
+<h2>Step 1: map the surface before touching it</h2>
+<p>The live API surface is exactly eight endpoints: <code>/api/session</code>, <code>/api/products</code>, <code>/api/cart</code>, <code>/api/cart/items</code>, <code>/api/cart/coupon</code>, <code>/api/cart/coupon/remove</code>, <code>/api/checkout</code>, <code>/api/newsletter</code>. I probed for hidden orders, receipts, coupons, config and admin routes and hit none. When the live surface matches the shipped client's own calls one to one, hidden-route hunting is the wrong lane: the vulnerability has to live in the contract of the found endpoints, in their gates, dedupe rules and stacking math.</p>
+<p>The next step was learning what the server recomputes on its own. I verified:</p>
+<ul>
+<li>percent/amount values injected into a promotion record are dropped and recomputed</li>
+<li>body fields on <code>/api/cart/items</code> (price, item_price, chosen_discount) are ignored, quantity clamps to &gt;= 1</li>
+<li><code>/api/checkout</code> ignores every total/credit/canCheckout/promotions field in its body</li>
+<li>one vault per session (second add answers <code>already_in_cart</code>)</li>
+<li>a control order for an &euro;8.90 product returns a receipt with no token field, confirming the win state is tied to the vault order</li>
+</ul>
+<p>Everything re-derives server-side except the one rule I had not exercised yet.</p>
+
+<h2>Step 2: the duplicate-coupon guard</h2>
+<p>Re-applying a code behaves correctly: a second <code>POST /api/cart/coupon</code> with the same code answers <code>coupon_already_applied</code> ("Coupon already applied."). The shipped <code>/static/js/app.js</code> sends exactly <code>{"code":"..."}</code> and nothing else. But the cart UI renders each promotion record with its own count, which tells you the server keeps a <code>count</code> field per promotion, and nothing in the UI bounds it.</p>
+<p>The probe was one extra key in the coupon body, an empty <code>promotions</code> array, a field the shipped client never sends:</p>
+<pre>{"code":"NIGHT20","promotions":[]}</pre>
+<p>No duplicate error. The response says "20% promotion applied." and the server's record becomes <code>count 2, amount 26,640</code>: 20% of &euro;666.00, twice. The duplicate-coupon check stops blocking the already-applied code when the request body carries a <code>promotions</code> key. The same probe with <code>NEWS30</code> gives <code>count 2, amount 39,960</code>. Combined: 66,600 off a 66,600 subtotal, exactly 100%, total &euro;0.00, and <code>canCheckout</code> flips to true.</p>
+<p>In my testing each code's count incremented once, reaching two, which is all this solve needed. Nothing in what I observed ties <code>count</code> to 1 and the discount math extends per record, so the same primitive reaches further wherever promo values allow.</p>
+<div class="callout"><strong>The finding, in one sentence.</strong> A client-supplied state key changed which branch a server-side check took. The request carried the same coupon code; only the presence of the extra key distinguished a rejected re-application from an accepted one.</div>
+
+<h2>The chain</h2>
+<table>
+<tr><th>#</th><th>Request</th><th>Server state after</th></tr>
+<tr><td>1</td><td><code>POST /api/cart/items</code> <code>{"productId":"midnight-vault"}</code></td><td>cart [vault], total &euro;666.00</td></tr>
+<tr><td>2</td><td><code>POST /api/cart/coupon</code> <code>{"code":"NIGHT20"}</code></td><td>NIGHT20 count 1, discount &euro;133.20, total &euro;532.80</td></tr>
+<tr><td>3</td><td><code>POST /api/newsletter</code> <code>{"email":"researcher@example.com"}</code></td><td>returns NEWS30</td></tr>
+<tr><td>4</td><td><code>POST /api/cart/coupon</code> <code>{"code":"NEWS30"}</code></td><td>NEWS30 count 1, discount &euro;333.00, total &euro;333.00</td></tr>
+<tr><td>5</td><td><code>POST /api/cart/coupon</code> <code>{"code":"NIGHT20","promotions":[]}</code></td><td>NIGHT20 count 2, discount &euro;466.20, total &euro;199.80</td></tr>
+<tr><td>6</td><td><code>POST /api/cart/coupon</code> <code>{"code":"NEWS30","promotions":[]}</code></td><td>NEWS30 count 2, discount &euro;666.00, total &euro;0.00, canCheckout true</td></tr>
+<tr><td>7</td><td><code>POST /api/checkout</code> <code>{}</code></td><td>receipt: paid &euro;0.00, token inside</td></tr>
+</table>
+<p>Steps 5 and 6 are the vulnerability. Both re-apply a code the duplicate guard should reject, and each increments that promotion's count.</p>
+
+<h2>Two receipts, one token</h2>
+<p>I captured the receipt twice, once through the browser session and once by rebuilding the whole chain from a clean session with a scripted curl client only. Two different order ids, same token. The token value is withheld on this site:</p>
+<pre>{"ok":true,"receipt":{"paid":0,"credit":6600,
+"message":"Your order is confirmed and being prepared.",
+"flag":"INTIGRITI{...}"}}</pre>
+<p><code>paid: 0</code> on a &euro;666.00 product. A control order for the &euro;8.90 product returned a receipt with no flag field, confirming the win state is specific to the vault order.</p>
+<p>Dead ends I did not bother re-testing after the first pass: the newsletter code is static, so alternate emails or type confusion buy nothing; near-duplicate codes (leading/trailing space, case) still dedupe, so normalization was not the fault; the vault item itself rejects duplicate adds; and the checkout endpoint trusts nothing in its body.</p>
+
+<h2>What I'd tell the developer</h2>
+<ul>
+<li>On the coupon-apply endpoint, ignore any client-supplied <code>promotions</code> key entirely: the canonical applied-promotions list is server-side session state.</li>
+<li>Enforce the duplicate check after normalizing the request code, regardless of any extra body keys.</li>
+<li>Cap each promotion record's count at 1 and reject discount sums above 100%.</li>
+</ul>
+
+<h2>What I'd tell past-me</h2>
+<div class="lesson"><p><strong>1. Diff request shapes against the accepted contract.</strong> Fields the client never sends but the server still reads are a first-class bypass surface.</p></div>
+<div class="lesson"><p><strong>2. When the live API surface equals the client's own call list, stop hunting hidden routes.</strong> Attack the found endpoints' edge logic: the gates, the dedupe rules, the stacking math.</p></div>
+<div class="lesson"><p><strong>3. Assume every number is recomputed server-side until proven otherwise.</strong> Then spend the effort on the one surface that still trusts the client.</p></div>
+<div class="lesson"><p><strong>4. Stop and bank.</strong> The moment a state-mutating probe succeeds, halt the script and record the winning state before any cleanup step dismantles it.</p></div>
+<div class="lesson"><p><strong>5. Shared infrastructure leaks other players' guesses.</strong> The challenge sat behind a shared proxy pool; foreign request bodies occasionally desynced into my connections as malformed-request dumps. Forcing HTTP/1.1 with <code>Connection: close</code>, retrying on malformed responses, and treating leaked foreign payloads as other researchers' guesses rather than field-name discovery kept the session clean.</p></div>
+
+<div class="footer">
+Solved during the live challenge window (Oct 19-26, 2026), published after close per challenge rules. Sanctioned CTF: no real systems were affected. Repro artifact: <code>ctf-1026-repro.sh</code>, which rebuilds the whole chain from a fresh session.
+</div>
+
+</div>
+</body>
+</html>

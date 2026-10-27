@@ -514,13 +514,13 @@ window.addEventListener('scroll', () => {
                 ]
             },
             {
-                title: '1026: array bypass of a coupon validation guard',
+                title: '1026: client-supplied key defeats a coupon duplicate guard',
                 sev: 'Medium',
-                meta: 'Intigriti 1026 · submission accepted',
-                link: null,
+                meta: 'Intigriti 1026 · submission accepted · write-up published',
+                link: 'ctf-1026-writeup.html',
                 body: [
-                    'The coupon redemption guard validated a scalar while the upstream deserializer accepted an array, letting the guard be bypassed across parallel redemption requests. Classified CWE-284 and verified with a clean-room repro.',
-                    'Submission accepted. Flag values and challenge specifics stay sanitized for now; write-up page is queued behind this month\'s closure.'
+                    'Adding a client-supplied `promotions` key (a field the shipped client never sends) to the coupon-apply body defeated the duplicate-coupon guard: an already-applied code was accepted again, and the record\'s discount re-applied. Doubling NIGHT20 and NEWS30 stacked the discount to 100% and the €666 vault order checked out at €0.00.',
+                    'Filed as access-control (CWE-284), submitted during the window and accepted, verified by a clean-room repro. Flag values stay withheld on this site; the linked write-up covers the full chain and the fixes.'
                 ]
             }
         ]
