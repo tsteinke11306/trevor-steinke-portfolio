@@ -214,19 +214,30 @@ const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
 const currentTheme = localStorage.getItem('theme') ||
     (prefersLight.matches ? 'light' : 'dark');
 
-// Apply theme on page load
+// Apply theme on page load (and keep <meta name="color-scheme"> in sync)
+const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
+function applyTheme(theme) {
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+    if (colorSchemeMeta) colorSchemeMeta.setAttribute('content', theme);
+}
 if (currentTheme === 'light') {
-    document.documentElement.setAttribute('data-theme', 'light');
+    applyTheme('light');
+} else if (colorSchemeMeta) {
+    colorSchemeMeta.setAttribute('content', 'dark');
 }
 
 themeToggle.addEventListener('click', () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
 
     if (currentTheme === 'light') {
-        document.documentElement.removeAttribute('data-theme');
+        applyTheme('dark');
         localStorage.setItem('theme', 'dark');
     } else {
-        document.documentElement.setAttribute('data-theme', 'light');
+        applyTheme('light');
         localStorage.setItem('theme', 'light');
     }
 });

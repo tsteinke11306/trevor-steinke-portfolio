@@ -14,6 +14,7 @@
    ============================================ */
 
 :root {
+    color-scheme: dark;
     /* Monochrome palette - dark is default */
     --primary-color: #ffffff;
     --primary-hover: #e0e0e0;
@@ -62,6 +63,7 @@
 
 /* Light B&W theme (toggled on) */
 [data-theme="light"] {
+    color-scheme: light;
     --primary-color: #0a0a0a;
     --primary-hover: #000000;
     --secondary-color: #555555;
@@ -1195,8 +1197,10 @@ body::after {
 
 .finding-meta a {
     color: var(--text-color);
-    text-decoration: none;
-    border-bottom: 1px solid var(--glass-border-hover);
+    text-decoration: underline;
+    text-decoration-color: var(--glass-border-hover);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
 }
 
 .finding {
@@ -1701,13 +1705,15 @@ body::after {
 
 .contact-links a {
     color: var(--text-color);
-    text-decoration: none;
+    text-decoration: underline;
+    text-decoration-color: var(--glass-border);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
     transition: var(--transition);
-    border-bottom: 1px solid var(--glass-border);
 }
 
 .contact-links a:hover {
-    border-bottom-color: var(--text-color);
+    text-decoration-color: var(--text-color);
     opacity: 0.8;
 }
 
