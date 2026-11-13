@@ -658,7 +658,7 @@ window.addEventListener('scroll', () => {
                 const c = cards[i];
                 const rz = Math.max(-1, Math.min(1, d)) * -14;   // deg, toward center
                 const z = -Math.min(ad, MAXD) * 170;             // push back
-                const o = ad >= MAXD + 0.5 ? 0 : 1 - (ad / (MAXD + 0.6)) * 0.75;
+                const o = ad >= MAXD + 0.5 ? 0 : 1 - (ad / (MAXD + 0.6)) * 0.5;
                 const xShift = (d === 0 && shift) ? shift : (d !== 0 ? shift * Math.max(0, 1 - ad / 2) : 0);
                 c.style.transform = 'translate3d(' + (d * gap() + xShift) + 'px,' + (ad * 14) + 'px,' + z + 'px) rotateY(' + rz + 'deg)';
                 c.style.opacity = o.toFixed(3);
